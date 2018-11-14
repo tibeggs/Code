@@ -1,64 +1,41 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 13 10:33:13 2018
-
-@author: rl7276c
-"""
-
 #Import libraries
 import pandas as pd
-import time
-
-t0=time.time()
+import numpy as np
+import math as ma
 
 #Import cbp state data
 path = "M:\\TSA\\c.tasks\\Task 17 UpdatingRegDatabasePhase2\\Python\\Geo_Datasets"
-cbp = pd.read_csv(path +"\\cbp12co.csv")
-cbp = cbp[['fipstate','fipscty','naics','empflag','emp','ap','est']]
-
+cbp = pd.read_csv(path +'/cbp12st_compact.csv')
+cbp = cbp[['fipstate','naics','empflag','emp','ap','est']]
+cbp.info()
+cbp.describe()
+cbp.head()
 
 #Import employment range data and merge with cbp state data
 erange = pd.read_csv(path+ '/employment_ranges.csv')
+erange.head()
 cbp_erange = pd.merge(cbp, erange,how='left',on='empflag')
-
-
-
-
-cbp_erange["fipsstcty"]=cbp_erange["fipstate"].astype(str)+"-"+cbp_erange["fipscty"].astype(str)
-cbp_erange["stctyid"]=cbp_erange["fipsstcty"].rank(method='dense').astype(int)
-
-
+cbp_erange.info()
+cbp_erange.head()
 
 #Clean cbp state data and prepare for filling
 cbp_erange['naics'] = cbp_erange['naics'].str.replace('------','Total')
 cbp_erange['naics'] = cbp_erange['naics'].str.replace('/','')
 cbp_erange['naics'] = cbp_erange['naics'].str.replace('-','')
-cbp_erange['cty_naics'] = cbp_erange['stctyid'].map(str) + '-' + cbp_erange['naics'].map(str)
+cbp_erange['state_naics'] = cbp_erange['fipstate'].map(str) + '-' + cbp_erange['naics'].map(str)
 cbp_erange.head()
-cbp_erange = cbp_erange[['e_range','emp','ap','est','cty_naics','fipstate','fipscty','fipsstcty']]
-cbp_erange.set_index('cty_naics',inplace=True)
+cbp_erange = cbp_erange[['e_range','emp','ap','est','state_naics']]
+cbp_erange.set_index('state_naics',inplace=True)
 cbp_erange.head()
 
-cbp_erange =cbp_erange[(cbp_erange["fipstate"]==1) & (cbp_erange["fipscty"]<=10)]
-
-
+list(cbp)
 cbp.head()
 
 #Emp variable
 
-vcount=cbp_erange["fipscty"].value_counts().count()
-
-nlist = [11, 21, 22, 23, 31, 32, 33, 42, 44, 45, 48, 49, 51, 52, 53, 54, 55, 56, 61, 62, 71, 72, 81, 99]
-n1list = [11, 21, 22, 23]
-n2list=[31, 32, 33]
-n3list=[42]
-n4list=[44, 45]
-n5list=[48, 49]
-n6list=[51, 52, 53, 54, 55, 56, 61, 62, 71, 72, 81, 99]
-
 #Two digit emp
-State_var = 1 
-while State_var < vcount:
+State_var = 1  
+while State_var < 60:
     NAICS_var = 0
     NAICS_rest_sum = 0
     count = 0
@@ -91,7 +68,7 @@ while State_var < vcount:
 
 #Three digit emp
 State_var = 0 
-while State_var < vcount:
+while State_var < 60:
     #NAICS 11-23
     NAICS_var = 11
     while NAICS_var < 24:
@@ -345,7 +322,7 @@ while State_var < vcount:
 
 #Four digit emp
 State_var = 0 
-while State_var < vcount:
+while State_var < 60:
     NAICS_var = 111
     while NAICS_var < 1000:
         NAICS_var_2 = 0
@@ -381,7 +358,7 @@ while State_var < vcount:
 
 #Five digit emp
 State_var = 0 
-while State_var < vcount:
+while State_var < 60:
     NAICS_var = 1111
     while NAICS_var < 10000:
         NAICS_var_2 = 0
@@ -417,7 +394,7 @@ while State_var < vcount:
 
 #Six digit emp
 State_var = 0 
-while State_var < vcount:
+while State_var < 60:
     NAICS_var = 11111
     while NAICS_var < 100000:   
         NAICS_var_2 = 0
@@ -455,7 +432,7 @@ while State_var < vcount:
 
 #Two digit ap
 State_var = 1  
-while State_var < vcount:
+while State_var < 60:
     NAICS_var = 0
     NAICS_rest_sum = 0
     count = 0
@@ -488,7 +465,7 @@ while State_var < vcount:
 
 #Three digit ap
 State_var = 0 
-while State_var < vcount:
+while State_var < 60:
     #NAICS 11-23
     NAICS_var = 11
     while NAICS_var < 24:
@@ -742,7 +719,7 @@ while State_var < vcount:
 
 #Four digit ap
 State_var = 0 
-while State_var < vcount:
+while State_var < 60:
     NAICS_var = 111
     while NAICS_var < 1000:
         NAICS_var_2 = 0
@@ -778,7 +755,7 @@ while State_var < vcount:
 
 #Five digit ap
 State_var = 0 
-while State_var < vcount:
+while State_var < 60:
     NAICS_var = 1111
     while NAICS_var < 10000:
         NAICS_var_2 = 0
@@ -814,7 +791,7 @@ while State_var < vcount:
 
 #Six digit ap
 State_var = 0 
-while State_var < vcount:
+while State_var < 60:
     NAICS_var = 11111
     while NAICS_var < 100000:   
         NAICS_var_2 = 0
@@ -847,14 +824,12 @@ while State_var < vcount:
                 NAICS_var_2 = NAICS_var_2 + 1
         NAICS_var = NAICS_var + 1   
     State_var = State_var + 1
-t1=time.time()
-total_time=t1-t0
-print(total_time)
+
  #Export filled data
-cbp_erange.to_csv(path+'/cbp_erange_cty_t.csv')
+cbp_erange.to_csv('C:/Users/jdavis/OneDrive - ECONOMETRICA INC/Projects/TSA/Regulatory Database - Phase II/Python/Geo_Datasets/cbp_erange_state.csv')
 
 #Import complete dataset and filter out state and NAICS
-cbp_fill_state = pd.read_csv(path+'/cbp_erange_cty.csv')
-#cbp_fill_state['fipstate'] = cbp_fill_state['cty_naics'].apply(lambda x: x.split('-')[0])
-cbp_fill_state['naics'] = cbp_fill_state['cty_naics'].apply(lambda x: x.split('-')[1])
-cbp_fill_state.to_csv(path+'/cbp_fill_state.csv')
+cbp_fill_state = pd.read_csv('C:/Users/jdavis/OneDrive - ECONOMETRICA INC/Projects/TSA/Regulatory Database - Phase II/Python/Geo_Datasets/cbp_erange_state.csv')
+cbp_fill_state['fipstate'] = cbp_fill_state['state_naics'].apply(lambda x: x.split('-')[0])
+cbp_fill_state['naics'] = cbp_fill_state['state_naics'].apply(lambda x: x.split('-')[1])
+cbp_fill_state.to_csv('C:/Users/jdavis/OneDrive - ECONOMETRICA INC/Projects/TSA/Regulatory Database - Phase II/Python/Geo_Datasets/cbp_fill_state.csv')

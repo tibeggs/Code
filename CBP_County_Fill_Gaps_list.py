@@ -65,6 +65,7 @@ while State_var < vcount:
     count1_string = ""
     flagsum = 0    
     while NAICS_var < 100:
+    for Naics_var in nlist:
         try: 
             if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'])==0):
                 count1_string = str(State_var)+'-'+str(NAICS_var)
