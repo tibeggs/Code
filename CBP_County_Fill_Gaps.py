@@ -39,17 +39,14 @@ cbp_erange = cbp_erange[['e_range','emp','ap','est','cty_naics','fipstate','fips
 cbp_erange.set_index('cty_naics',inplace=True)
 cbp_erange.head()
 
-test =cbp_erange[cbp_erange["fipstate"]==1]
+cbp_erange =cbp_erange[cbp_erange["fipstate"]==1]
 
-test2=test["fipscty"].value_counts()
-test.to_csv(path+"/testing.csv")
 
-list(test)
 cbp.head()
 
 #Emp variable
 
-vcount=68
+vcount=cbp_erange["fipscty"].value_counts().count()
 
 #Two digit emp
 State_var = 1  
