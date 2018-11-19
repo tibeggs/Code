@@ -23,16 +23,22 @@ cbp_erange = pd.merge(cbp, erange,how='left',on='empflag')
 
 
 
-
 cbp_erange["fipsstcty"]=cbp_erange["fipstate"].astype(str)+"-"+cbp_erange["fipscty"].astype(str)
 cbp_erange["stctyid"]=cbp_erange["fipsstcty"].rank(method='dense').astype(int)
 
 
 
+cbp_erange=cbp_erange[cbp_erange["stctyid"]<=5]
+
 #Clean cbp state data and prepare for filling
 cbp_erange['naics'] = cbp_erange['naics'].str.replace('------','Total')
 cbp_erange['naics'] = cbp_erange['naics'].str.replace('/','')
 cbp_erange['naics'] = cbp_erange['naics'].str.replace('-','')
+
+naics_list=set(cbp_erange['naics'][cbp_erange['naics'].str.len()==6].str[:5])
+
+
+
 cbp_erange['cty_naics'] = cbp_erange['stctyid'].map(str) + '-' + cbp_erange['naics'].map(str)
 cbp_erange.head()
 cbp_erange = cbp_erange[['e_range','emp','ap','est','cty_naics','fipstate','fipscty','fipsstcty','stctyid']]
@@ -290,37 +296,28 @@ while State_var < vcount:
 #Six digit emp
 State_var = 0 
 while State_var < vcount:
-    NAICS_var = 11111
-    while NAICS_var < 100000:   
-        NAICS_var_2 = 0
+    for NAICS_var in naics_list:   
         NAICS_rest_sum = 0
         count = 0
         count1_string = ""
         flagsum = 0
-        while NAICS_var_2 < 10:
-            try: 
+        for NAICS_var_2 in range(10):
+            if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
                 if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
                     count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
                     count = count + 1
                     flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
                 else:
                     NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp']
-            except:
-                X_test = 0
-            NAICS_var_2 = NAICS_var_2 + 1
         if count == 1:
             cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
         if count > 1:
             NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
             NAICS_var_2 = 0
-            while NAICS_var_2 < 10:
-                try: 
+            for NAICS_var_2 in range(10):
+                if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
                     if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
                         cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-                except:
-                    X_test = 0    
-                NAICS_var_2 = NAICS_var_2 + 1
-        NAICS_var = NAICS_var + 1   
     State_var = State_var + 1
 #
 #
