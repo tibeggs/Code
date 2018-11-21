@@ -130,8 +130,10 @@ dfl4.columns = ['stctyid','naics5','naics_len','emp_sum','erange_sum']
 #dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
 #dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']=='To')]
 
+#need to add measure for above sum being 0
+
 for naics_code in cbp_erange.index:
-    naics_code='5-4239'
+    naics_code='2-44314'
     if cbp_erange.loc[naics_code,'emp']==0:
         if cbp_erange.loc[naics_code,'naics_len']<=5:
             if cbp_erange.loc[naics_code,'naics_len']==2:
@@ -166,7 +168,7 @@ for naics_code in cbp_erange.index:
                 except:
                     'fail'
                 try:
-                    above_sum=dfl1.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                    above_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
                 except:
                     'fail'
                 try:
@@ -185,7 +187,7 @@ for naics_code in cbp_erange.index:
                 except:
                     'fail'
                 try:
-                    flag_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
+                    flag_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
                 except:
                     'fail'
                 try:
@@ -200,7 +202,6 @@ for naics_code in cbp_erange.index:
                     range_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
                 except:
                     'fail'
-
             if cbp_erange.loc[naics_code,'naics_len']==5:
                 try:
                     test_sum=dfl4.loc[(dfl4['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl4['naics5']==(cbp_erange.loc[(naics_code),'naics5'])) & (dfl4['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
@@ -226,7 +227,8 @@ for naics_code in cbp_erange.index:
                     
             try:
                 if cbp_erange.loc[(naics_code),'e_range']/flag_sum*(above_sum-line_sum)<=test_sum:
-                    x = (test_sum*flag_sum/(above_sum-line_sum))/(1-(test_sum/(above_sum-line_sum)))        
+                    x = (test_sum*flag_sum/(above_sum-line_sum))/(1-(test_sum/(above_sum-line_sum)))
+                    test_sum/flag_sum
                     cbp_erange.loc[(naics_code),'e_range'] = range_sum + x
             except:
                 'fail'
