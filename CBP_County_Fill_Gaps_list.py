@@ -14,6 +14,7 @@ import time
 #Import cbp state data
 path = "M:\\TSA\\c.tasks\\Task 17 UpdatingRegDatabasePhase2\\Python\\Geo_Datasets"
 cbp = pd.read_csv(path +"\\cbp12co.csv")
+state_totals = pd.read_csv(path+"\\cbp_state_totals.csv")
 cbp = cbp[['fipstate','fipscty','naics','empflag','emp','ap','est','emp_nf']]
 
 #Import employment range data and merge with cbp state data
@@ -27,10 +28,11 @@ cbp_erange["stctyid"]=cbp_erange["fipsstcty"].rank(method='dense').astype(int)
 
 
 
-cbp_erange=cbp_erange[cbp_erange["stctyid"]<=100]
+#cbp_erange=cbp_erange[cbp_erange["stctyid"]<=100]
 
 #Clean cbp state data and prepare for filling
 cbp_erange['naics'] = cbp_erange['naics'].str.replace('------','Total')
+
 cbp_erange['naics'] = cbp_erange['naics'].str.replace('/','')
 cbp_erange['naics'] = cbp_erange['naics'].str.replace('-','')
 
@@ -43,16 +45,22 @@ naics_list6=set(cbp_erange['naics'][cbp_erange['naics'].str.len()==6].str[:5])
 
 cbp_erange['cty_naics'] = cbp_erange['stctyid'].map(str) + '-' + cbp_erange['naics'].map(str)
 cbp_erange.head()
-cbp_erange = cbp_erange[['e_range','emp','ap','est','cty_naics','fipstate','fipscty','fipsstcty','stctyid','emp_nf']]
+cbp_erange = cbp_erange[['e_range','emp','ap','est','cty_naics','fipstate','fipscty','fipsstcty','stctyid','emp_nf','naics']]
 cbp_erange.set_index('cty_naics',inplace=True)
 cbp_erange.head()
-
-
-
 
 #Emp variable
 
 vcount=cbp_erange["stctyid"].value_counts().count()+1
+
+cbp_erange['naics_len'] = cbp_erange['naics'].str.len()
+
+for state_var in range(vcount):
+    naics_code=str(state_var)+"-Total"
+    if naics_code in cbp_erange.index:
+        cbp_erange.loc[naics_code,'naics_len'] = 1
+
+
 
 nlist = [11, 21, 22, 23, 31, 32, 33, 42, 44, 45, 48, 49, 51, 52, 53, 54, 55, 56, 61, 62, 71, 72, 81, 99]
 n1list = [11, 21, 22, 23, 42, 51, 52, 53, 54, 55, 56, 61, 62, 71, 72, 81, 99]
@@ -63,11 +71,63 @@ n5list=[48]
 
 
 
+df1=cbp_erange.loc[(cbp_erange['naics_len']==1)][['fipstate','emp']].groupby('fipstate').sum()
+df2=cbp_erange.loc[(cbp_erange['naics_len']==1)][['fipstate','e_range']].groupby('fipstate').sum()
+df3=cbp_erange.loc[(cbp_erange['naics_len']==1)][['fipstate','ap']].groupby('fipstate').sum()
+df4=cbp_erange.loc[(cbp_erange['naics_len']==1)&(cbp_erange['e_range'].notnull())][['fipstate','emp']].groupby('fipstate').sum()
+
+
+#does not work if on limited set due to how stctyid works need to be on whole bundle
+state_var=1
 for state_var in range(vcount):
     naics_code=str(state_var)+"-Total"
     if naics_code in cbp_erange.index:
         if (cbp_erange.loc[naics_code,'emp']==0):
-            cbp_erange.loc[naics_code,'emp'] = cbp_erange.loc[naics_code,'e_range']
+            state = cbp_erange.loc[naics_code,'fipstate']
+            state_code = str(state)+"-999"
+            cbp_erange.loc[naics_code,'emp'] =(state_totals.loc[state_totals['fipstate']==state]['emp'].item()-df1.loc[state].item())*cbp_erange.loc[naics_code,'e_range'] /df2.loc[state].item()
+        if (cbp_erange.loc[naics_code,'ap']==0):
+            state = cbp_erange.loc[naics_code,'fipstate']
+            state_code = str(state)+"-999"
+            cbp_erange.loc[naics_code,'ap'] =(state_totals.loc[state_totals['fipstate']==state]['ap'].item()-df3.loc[state].item())*cbp_erange.loc[naics_code,'emp'] /df1.loc[state].item()
+
+#limit count to 50
+cbp_erange = cbp_erange[cbp_erange['stctyid']<=50]
+
+
+cbp_erange['naics2'] = cbp_erange['naics'].str[:2]
+
+cbp_erange.loc[cbp_erange['naics2'].isin(['32','33']),'naics2'] = '31'
+cbp_erange.loc[cbp_erange['naics2'].isin(['43']),'naics2'] = '42'
+cbp_erange.loc[cbp_erange['naics2'].isin(['45']),'naics2'] = '44'
+cbp_erange.loc[cbp_erange['naics2'].isin(['49']),'naics2'] = '48'
+
+
+
+    
+dfl=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
+dfl.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
+
+for naics_code in cbp_erange.index:
+    if cbp_erange.loc[naics_code,'emp']==0:  
+        if cbp_erange.loc[naics_code,'naics_len']==3:
+            test_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum']
+            flag_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum']
+            above_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']=='To') & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']-1)), 'emp_sum']
+            line_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum']
+        else:
+            test_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum']
+            flag_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum']
+            above_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']-1)), 'emp_sum']
+            line_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum']
+        if isinstance(test_sum, float):
+            if test_sum>0:
+                x = test_sum*flag_sum(above_sum-line_sum)*(1-(test_sum/(above_sum-line_sum)))
+                cbp_erange.loc[(naics_code),'e_range'] = cbp_erange.loc[(naics_code),'e_range'] + x
+
+
+
+
 
 t0=time.time()
 #Two digit emp
@@ -587,7 +647,7 @@ t1=time.time()
 total_time=t1-t0
 print(total_time)
  #Export filled data
-cbp_erange.to_csv(path+'/cbp_erange_cty_t1.csv')
+cbp_erange.to_csv(path+'/cbp_erange_cty_t3.csv')
 
 #Import complete dataset and filter out state and NAICS
 cbp_fill_state = pd.read_csv(path+'/cbp_erange_cty.csv')
