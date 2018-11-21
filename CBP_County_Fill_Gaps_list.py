@@ -57,7 +57,7 @@ cbp_erange['naics_len'] = cbp_erange['naics'].str.len()
 
 
 #start timing
-t0=time.time()
+
 
 for state_var in range(vcount):
     naics_code=str(state_var)+"-Total"
@@ -98,6 +98,7 @@ for state_var in range(vcount):
 #limit count to 50
 cbp_erange = cbp_erange[cbp_erange['stctyid']<=10]
 
+t0=time.time()
 
 cbp_erange['naics2'] = cbp_erange['naics'].str[:2]
 
@@ -132,7 +133,7 @@ for naics_code in cbp_erange.index:
             except:
                 'fail'
             try:
-                flag_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+                range_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
             except:
                 'fail'
         else:
@@ -153,14 +154,14 @@ for naics_code in cbp_erange.index:
             except:
                 'fail'
             try:
-                flag_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+                range_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
             except:
                 'fail'
         try:
             if cbp_erange.loc[(naics_code),'e_range']/flag_sum*(above_sum-line_sum)<=test_sum:
-                x = (test_sum*flag_sum/(above_sum-line_sum))*(1-(test_sum/(above_sum-line_sum)))
+                x = (test_sum*flag_sum/(above_sum-line_sum))/(1-(test_sum/(above_sum-line_sum)))
                 
-                cbp_erange.loc[(naics_code),'e_range'] = flag_sum + x
+                cbp_erange.loc[(naics_code),'e_range'] = range_sum + x
         except:
             'fail'
 
@@ -432,7 +433,7 @@ while State_var < vcount:
     State_var = State_var + 1
 
 t2=time.time()
-total_time2=t2-t0
+total_time2=t2-t1
 print(total_time2)    
 
 #Ap variable
@@ -685,7 +686,7 @@ while State_var < vcount:
                         cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'ap'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] / flagsum * NAICS_rem 
     State_var = State_var + 1
 t3=time.time()
-total_time3=t3-t0
+total_time3=t3-t2
 print(total_time3)
  #Export filled data
 cbp_erange.to_csv(path+'/cbp_erange_cty_t3.csv')
