@@ -101,6 +101,9 @@ cbp_erange = cbp_erange[cbp_erange['stctyid']<=10]
 t0=time.time()
 
 cbp_erange['naics2'] = cbp_erange['naics'].str[:2]
+cbp_erange['naics3'] = cbp_erange['naics'].str[:3]
+cbp_erange['naics4'] = cbp_erange['naics'].str[:4]
+cbp_erange['naics5'] = cbp_erange['naics'].str[:5]
 
 cbp_erange.loc[cbp_erange['naics2'].isin(['32','33']),'naics2'] = '31'
 cbp_erange.loc[cbp_erange['naics2'].isin(['43']),'naics2'] = '42'
@@ -108,67 +111,131 @@ cbp_erange.loc[cbp_erange['naics2'].isin(['45']),'naics2'] = '44'
 cbp_erange.loc[cbp_erange['naics2'].isin(['49']),'naics2'] = '48'
 
 
-
+dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
+dfl.columns = ['stctyid','naics_len','emp_sum','erange_sum']
     
-dfl=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
-dfl.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
+dfl1=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
+dfl1.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
+
+dfl2=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
+dfl2.columns = ['stctyid','naics3','naics_len','emp_sum','erange_sum']
+
+dfl3=cbp_erange[['stctyid','naics4','naics_len','emp','e_range']].groupby(['stctyid','naics4','naics_len']).sum().reset_index()
+dfl3.columns = ['stctyid','naics4','naics_len','emp_sum','erange_sum']
+
+dfl4=cbp_erange[['stctyid','naics5','naics_len','emp','e_range']].groupby(['stctyid','naics5','naics_len']).sum().reset_index()
+dfl4.columns = ['stctyid','naics5','naics_len','emp_sum','erange_sum']
+
+
+#dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
+#dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']=='To')]
 
 for naics_code in cbp_erange.index:
-    if cbp_erange.loc[naics_code,'emp']==0:  
-        if cbp_erange.loc[naics_code,'naics_len']==2:
+    naics_code='5-4239'
+    if cbp_erange.loc[naics_code,'emp']==0:
+        if cbp_erange.loc[naics_code,'naics_len']<=5:
+            if cbp_erange.loc[naics_code,'naics_len']==2:
+                try:
+                    test_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    flag_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
+                except:
+                    'fail'
+                try:
+                    above_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']=='To') & (dfl1['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    line_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    range_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+                except:
+                    'fail'
+
+            if cbp_erange.loc[naics_code,'naics_len']==3:
+                try:
+                    test_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    flag_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
+                except:
+                    'fail'
+                try:
+                    above_sum=dfl1.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    line_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    range_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+                except:
+                    'fail'
+                    
+                    
+            if cbp_erange.loc[naics_code,'naics_len']==4:
+                try:
+                    test_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    flag_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
+                except:
+                    'fail'
+                try:
+                    above_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    line_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    range_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+                except:
+                    'fail'
+
+            if cbp_erange.loc[naics_code,'naics_len']==5:
+                try:
+                    test_sum=dfl4.loc[(dfl4['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl4['naics5']==(cbp_erange.loc[(naics_code),'naics5'])) & (dfl4['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    flag_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
+                except:
+                    'fail'
+                try:
+                    above_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    line_sum=dfl4.loc[(dfl4['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl4['naics5']==(cbp_erange.loc[(naics_code),'naics5'])) & (dfl4['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                except:
+                    'fail'
+                try:
+                    range_sum=dfl4.loc[(dfl4['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl4['naics5']==(cbp_erange.loc[(naics_code),'naics5'])) & (dfl4['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+                except:
+                    'fail'
+
+                    
             try:
-                test_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
+                if cbp_erange.loc[(naics_code),'e_range']/flag_sum*(above_sum-line_sum)<=test_sum:
+                    x = (test_sum*flag_sum/(above_sum-line_sum))/(1-(test_sum/(above_sum-line_sum)))        
+                    cbp_erange.loc[(naics_code),'e_range'] = range_sum + x
             except:
                 'fail'
-            try:
-                flag_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
-            except:
-                'fail'
-            try:
-                above_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']=='To') & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']-1)), 'emp_sum'].item()
-            except:
-                'fail'
-            try:
-                line_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-            except:
-                'fail'
-            try:
-                range_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-            except:
-                'fail'
-        else:
-            try:
-                test_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-            except:
-                'fail'
-            try:
-                flag_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
-            except:
-                'fail'
-            try:
-                above_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']-1)), 'emp_sum'].item()
-            except:
-                'fail'
-            try:
-                line_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-            except:
-                'fail'
-            try:
-                range_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-            except:
-                'fail'
-        try:
-            if cbp_erange.loc[(naics_code),'e_range']/flag_sum*(above_sum-line_sum)<=test_sum:
-                x = (test_sum*flag_sum/(above_sum-line_sum))/(1-(test_sum/(above_sum-line_sum)))
-                
-                cbp_erange.loc[(naics_code),'e_range'] = range_sum + x
-        except:
-            'fail'
 
 t1=time.time()
 total_time=t1-t0
 print(total_time)
 
+#cbp_erange.to_csv(path+"\\outtest.csv")
 
 
 
@@ -687,7 +754,9 @@ while State_var < vcount:
     State_var = State_var + 1
 t3=time.time()
 total_time3=t3-t2
+total_time4=t3-t0
 print(total_time3)
+print(total_time4)
  #Export filled data
 cbp_erange.to_csv(path+'/cbp_erange_cty_t3.csv')
 
