@@ -126,29 +126,32 @@ dfl3.columns = ['stctyid','naics4','naics_len','emp_sum','erange_sum']
 dfl4=cbp_erange[['stctyid','naics5','naics_len','emp','e_range']].groupby(['stctyid','naics5','naics_len']).sum().reset_index()
 dfl4.columns = ['stctyid','naics5','naics_len','emp_sum','erange_sum']
 
-
+dfl1[(dfl1['stctyid']==2)&(dfl1['naics2']=='11')].groupby(['stctyid','naics2']).count()
+dfl1[(dfl1['stctyid']==2)&(dfl1['naics2']=='11')&(dfl1['naics_len']==3)]['emp_sum']
+dfl1[(dfl1['stctyid']==2)&(dfl1['naics2']=='11')&(dfl1['naics_len']==3)]['emp_sum']
 #dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
 #dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']=='To')]
 
 #need to add measure for above sum being 0
 for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
-    dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
-    dfl.columns = ['stctyid','naics_len','emp_sum','erange_sum']
-    dfl1=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
-    dfl1.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
-    if cbp_erange.loc[naics_code,'emp']==0:
-        a = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==2), 'emp_sum'].item()
-        b = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==1), 'emp_sum'].item()
-        dif = b-a
-        c = cbp_erange.loc[naics_code,'e_range']
-        d = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==2), 'erange_sum'].item()
-        per = c/d
-        e = dfl1.loc[dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
-        f = dfl1.loc[dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-        if per*dif <= e:
-            x = (e*d/dif)/(1-e/dif)
-            new_range = f + x
-            cbp_erange.loc[(naics_code),'e_range'] = new_range
+    if (cbp_erange.loc[naics_code,'naics2']!='99')&(cbp_erange.loc[naics_code,'naics2']!='To'):
+        dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
+        dfl.columns = ['stctyid','naics_len','emp_sum','erange_sum']
+        dfl1=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
+        dfl1.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
+        if cbp_erange.loc[naics_code,'emp']==0:
+            a = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==2), 'emp_sum'].item()
+            b = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==1), 'emp_sum'].item()
+            dif = b-a
+            c = cbp_erange.loc[naics_code,'e_range']
+            d = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==2), 'erange_sum'].item()
+            per = c/d
+            e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
+            f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+            if per*dif <= e:
+                x = (e*d/dif)/(1-e/dif)
+                new_range = f + x
+                cbp_erange.loc[(naics_code),'e_range'] = new_range
 
 #Two digit emp
 State_var = 1 
@@ -189,8 +192,8 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
         c = cbp_erange.loc[naics_code,'e_range']
         d = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl['naics_len']==3), 'erange_sum'].item()
         per = c/d
-        e = dfl1.loc[dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
-        f = dfl1.loc[dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+        e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
+        f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
         if per*dif <= e:
             x = (e*d/dif)/(1-e/dif)
             new_range = f + x
@@ -354,8 +357,8 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
         c = cbp_erange.loc[naics_code,'e_range']
         d = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl['naics_len']==4), 'erange_sum'].item()
         per = c/d
-        e = dfl1.loc[dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
-        f = dfl1.loc[dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+        e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
+        f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
         if per*dif <= e:
             x = (e*d/dif)/(1-e/dif)
             new_range = f + x
@@ -402,8 +405,8 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==5].index:
         c = cbp_erange.loc[naics_code,'e_range']
         d = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl['naics_len']==5), 'erange_sum'].item()
         per = c/d
-        e = dfl1.loc[dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
-        f = dfl1.loc[dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+        e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
+        f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
         if per*dif <= e:
             x = (e*d/dif)/(1-e/dif)
             new_range = f + x
@@ -594,271 +597,271 @@ print(total_time)
 
 #cbp_erange.to_csv(path+"\\outtest.csv")
 
-
-
-#Two digit emp
-
-State_var = 1 
-while State_var < vcount:
-    NAICS_var = 0
-    NAICS_rest_sum = 0
-    count = 0
-    count1_string = ""
-    flagsum = 0    
-    for NAICS_var in nlist:
-        if str(State_var)+"-"+str(NAICS_var) in cbp_erange.index:
-            if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'])==0):
-                count1_string = str(State_var)+'-'+str(NAICS_var)
-                count = count + 1
-                flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range']
-            else:
-                NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp']
-    if count == 1:
-        cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-Total','emp'] - NAICS_rest_sum
-    if count > 1:
-        NAICS_var = 0
-        NAICS_rem = cbp_erange.loc[str(State_var)+'-Total','emp'] - NAICS_rest_sum
-        for NAICS_var in nlist:
-            if str(State_var)+"-"+str(NAICS_var) in cbp_erange.index:
-                if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'])==0):
-                    cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range'] / flagsum * NAICS_rem
-    State_var = State_var + 1
-
-
-#Three digit emp
-State_var = 0 
-while State_var < vcount:
-    #NAICS 11-23, 44, 51+
-    for NAICS_var in n1list:
-        NAICS_var_2 = 0
-        NAICS_rest_sum = 0
-        count = 0
-        count1_string = ""
-        flagsum = 0
-        for NAICS_var_2 in range(10):
-            if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
-                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                        count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
-                        count = count + 1
-                        flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
-                    else:
-                        NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp']
-        if count == 1:
-            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-        if count > 1:
-            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-            NAICS_var_2 = 0
-            for NAICS_var_2 in range(10):
-                if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
-                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
-
-  
-    #NAICS 31-33
-    for NAICS_var in n2list:
-        NAICS_rest_sum = 0
-        count = 0
-        count1_string = ""
-        flagsum = 0
-        for NAICS_var_2 in range(10):
-            if str(State_var)+"-31"+str(NAICS_var_2) in cbp_erange.index:   
-                if ((cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'])==0):
-                    count1_string = str(State_var)+'-'+'31'+str(NAICS_var_2)
-                    count = count + 1
-                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range']
-                else:
-                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp']
-            if str(State_var)+"-32"+str(NAICS_var_2) in cbp_erange.index:  
-                if ((cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'])==0):
-                    count1_string = str(State_var)+'-'+'32'+str(NAICS_var_2)
-                    count = count + 1
-                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range']
-                else:
-                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp']
-            if str(State_var)+"-33"+str(NAICS_var_2) in cbp_erange.index:  
-                if ((cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'])==0):
-                    count1_string = str(State_var)+'-'+'33'+str(NAICS_var_2)
-                    count = count + 1
-                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range']
-                else:
-                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp']
-
-        if count == 1:
-            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-        if count > 1:
-            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-            NAICS_var_2 = 0
-            for NAICS_var_2 in range(10):
-                if str(State_var)+"-31"+str(NAICS_var_2) in cbp_erange.index: 
-                    if ((cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-
-                if str(State_var)+"-32"+str(NAICS_var_2) in cbp_erange.index: 
-                    if ((cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-  
-                if str(State_var)+"-33"+str(NAICS_var_2) in cbp_erange.index:  
-                    if ((cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-
-    #NAICS 44-45
-    for NAICS_var in n4list:
-        NAICS_rest_sum = 0
-        count = 0
-        count1_string = ""
-        flagsum = 0
-        for NAICS_var_2 in range(10):
-            if str(State_var)+"-44"+str(NAICS_var_2) in cbp_erange.index:  
-                if ((cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'])==0):
-                    count1_string = str(State_var)+'-'+'44'+str(NAICS_var_2)
-                    count = count + 1                    
-                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range']
-                else:
-                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp']
-            if str(State_var)+"-45"+str(NAICS_var_2) in cbp_erange.index:  
-                if ((cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'])==0):
-                    count1_string = str(State_var)+'-'+'45'+str(NAICS_var_2)
-                    count = count + 1
-                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range']
-                else:
-                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp']
-        if count == 1:
-            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-        if count > 1:
-            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-            NAICS_var_2 = 0
-            for NAICS_var_2 in range(10):
-                if str(State_var)+"-44"+str(NAICS_var_2) in cbp_erange.index: 
-                    if ((cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-                if str(State_var)+"-45"+str(NAICS_var_2) in cbp_erange.index:  
-                    if ((cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem   
-
-    #NAICS 48-49
-    for NAICS_var in n5list:
-        NAICS_rest_sum = 0
-        count = 0
-        count1_string = ""
-        flagsum = 0
-        for NAICS_var_2 in range(10):
-            if str(State_var)+"-48"+str(NAICS_var_2) in cbp_erange.index:
-                if ((cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'])==0):
-                    count1_string = str(State_var)+'-'+'48'+str(NAICS_var_2)
-                    count = count + 1                    
-                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range']
-                else:
-                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp']
-            if str(State_var)+"-49"+str(NAICS_var_2) in cbp_erange.index: 
-                if ((cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'])==0):
-                    count1_string = str(State_var)+'-'+'49'+str(NAICS_var_2)
-                    count = count + 1
-                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range']
-                else:
-                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp']
-        if count == 1:
-            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-        if count > 1:
-            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-            NAICS_var_2 = 0
-            for NAICS_var_2 in range(10):
-                if str(State_var)+"-48"+str(NAICS_var_2) in cbp_erange.index:
-                    if ((cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-                if str(State_var)+"-49"+str(NAICS_var_2) in cbp_erange.index: 
-                    if ((cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-    
-    State_var = State_var + 1
-
-#Four digit emp
-State_var = 0 
-while State_var < vcount:
-    for i in nlist:
-        for d in range(10):
-            NAICS_var=str(i)+str(d)   
-            NAICS_rest_sum = 0
-            count = 0
-            count1_string = ""
-            flagsum = 0
-            for NAICS_var_2 in range(10):
-                if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
-                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                        count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
-                        count = count + 1
-                        flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
-                    else:
-                        NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp']
-            if count == 1:
-                cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-            if count > 1:
-                NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-                NAICS_var_2 = 0
-                for NAICS_var_2 in range(10):
-                    if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
-                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-    State_var = State_var + 1
-
-#Five digit emp
-State_var = 0 
-while State_var < vcount:
-    for i in nlist:
-        for d in range(11,100):
-            NAICS_var=str(i)+str(d)
-            NAICS_rest_sum = 0
-            count = 0
-            count1_string = ""
-            flagsum = 0
-            for NAICS_var_2 in range(10):
-                if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
-                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                        count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
-                        count = count + 1
-                        flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
-                    else:
-                        NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp']
-            if count == 1:
-                cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-            if count > 1:
-                NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-                for NAICS_var_2 in range(10):
-                    if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
-                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
-    State_var = State_var + 1
-
-
-#Six digit emp
-State_var = 0 
-while State_var < vcount:
-    for NAICS_var in naics_list6:   
-        NAICS_rest_sum = 0
-        count = 0
-        count1_string = ""
-        flagsum = 0
-        for NAICS_var_2 in range(10):
-            if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
-                if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                    count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
-                    count = count + 1
-                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
-                else:
-                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp']
-        if count == 1:
-            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-        if count > 1:
-            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
-            NAICS_var_2 = 0
-            for NAICS_var_2 in range(10):
-                if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
-                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-    State_var = State_var + 1
-
-t2=time.time()
-total_time2=t2-t1
-print(total_time2)    
+#
+#
+##Two digit emp
+#
+#State_var = 1 
+#while State_var < vcount:
+#    NAICS_var = 0
+#    NAICS_rest_sum = 0
+#    count = 0
+#    count1_string = ""
+#    flagsum = 0    
+#    for NAICS_var in nlist:
+#        if str(State_var)+"-"+str(NAICS_var) in cbp_erange.index:
+#            if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'])==0):
+#                count1_string = str(State_var)+'-'+str(NAICS_var)
+#                count = count + 1
+#                flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range']
+#            else:
+#                NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp']
+#    if count == 1:
+#        cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-Total','emp'] - NAICS_rest_sum
+#    if count > 1:
+#        NAICS_var = 0
+#        NAICS_rem = cbp_erange.loc[str(State_var)+'-Total','emp'] - NAICS_rest_sum
+#        for NAICS_var in nlist:
+#            if str(State_var)+"-"+str(NAICS_var) in cbp_erange.index:
+#                if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'])==0):
+#                    cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range'] / flagsum * NAICS_rem
+#    State_var = State_var + 1
+#
+#
+##Three digit emp
+#State_var = 0 
+#while State_var < vcount:
+#    #NAICS 11-23, 44, 51+
+#    for NAICS_var in n1list:
+#        NAICS_var_2 = 0
+#        NAICS_rest_sum = 0
+#        count = 0
+#        count1_string = ""
+#        flagsum = 0
+#        for NAICS_var_2 in range(10):
+#            if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
+#                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+#                        count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
+#                        count = count + 1
+#                        flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
+#                    else:
+#                        NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp']
+#        if count == 1:
+#            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#        if count > 1:
+#            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#            NAICS_var_2 = 0
+#            for NAICS_var_2 in range(10):
+#                if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
+#                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+#                        cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
+#
+#  
+#    #NAICS 31-33
+#    for NAICS_var in n2list:
+#        NAICS_rest_sum = 0
+#        count = 0
+#        count1_string = ""
+#        flagsum = 0
+#        for NAICS_var_2 in range(10):
+#            if str(State_var)+"-31"+str(NAICS_var_2) in cbp_erange.index:   
+#                if ((cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'])==0):
+#                    count1_string = str(State_var)+'-'+'31'+str(NAICS_var_2)
+#                    count = count + 1
+#                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range']
+#                else:
+#                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp']
+#            if str(State_var)+"-32"+str(NAICS_var_2) in cbp_erange.index:  
+#                if ((cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'])==0):
+#                    count1_string = str(State_var)+'-'+'32'+str(NAICS_var_2)
+#                    count = count + 1
+#                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range']
+#                else:
+#                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp']
+#            if str(State_var)+"-33"+str(NAICS_var_2) in cbp_erange.index:  
+#                if ((cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'])==0):
+#                    count1_string = str(State_var)+'-'+'33'+str(NAICS_var_2)
+#                    count = count + 1
+#                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range']
+#                else:
+#                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp']
+#
+#        if count == 1:
+#            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#        if count > 1:
+#            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#            NAICS_var_2 = 0
+#            for NAICS_var_2 in range(10):
+#                if str(State_var)+"-31"+str(NAICS_var_2) in cbp_erange.index: 
+#                    if ((cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'])==0):
+#                        cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+#
+#                if str(State_var)+"-32"+str(NAICS_var_2) in cbp_erange.index: 
+#                    if ((cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'])==0):
+#                        cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+#  
+#                if str(State_var)+"-33"+str(NAICS_var_2) in cbp_erange.index:  
+#                    if ((cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'])==0):
+#                        cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+#
+#    #NAICS 44-45
+#    for NAICS_var in n4list:
+#        NAICS_rest_sum = 0
+#        count = 0
+#        count1_string = ""
+#        flagsum = 0
+#        for NAICS_var_2 in range(10):
+#            if str(State_var)+"-44"+str(NAICS_var_2) in cbp_erange.index:  
+#                if ((cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'])==0):
+#                    count1_string = str(State_var)+'-'+'44'+str(NAICS_var_2)
+#                    count = count + 1                    
+#                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range']
+#                else:
+#                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp']
+#            if str(State_var)+"-45"+str(NAICS_var_2) in cbp_erange.index:  
+#                if ((cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'])==0):
+#                    count1_string = str(State_var)+'-'+'45'+str(NAICS_var_2)
+#                    count = count + 1
+#                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range']
+#                else:
+#                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp']
+#        if count == 1:
+#            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#        if count > 1:
+#            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#            NAICS_var_2 = 0
+#            for NAICS_var_2 in range(10):
+#                if str(State_var)+"-44"+str(NAICS_var_2) in cbp_erange.index: 
+#                    if ((cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'])==0):
+#                        cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+#                if str(State_var)+"-45"+str(NAICS_var_2) in cbp_erange.index:  
+#                    if ((cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'])==0):
+#                        cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem   
+#
+#    #NAICS 48-49
+#    for NAICS_var in n5list:
+#        NAICS_rest_sum = 0
+#        count = 0
+#        count1_string = ""
+#        flagsum = 0
+#        for NAICS_var_2 in range(10):
+#            if str(State_var)+"-48"+str(NAICS_var_2) in cbp_erange.index:
+#                if ((cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'])==0):
+#                    count1_string = str(State_var)+'-'+'48'+str(NAICS_var_2)
+#                    count = count + 1                    
+#                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range']
+#                else:
+#                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp']
+#            if str(State_var)+"-49"+str(NAICS_var_2) in cbp_erange.index: 
+#                if ((cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'])==0):
+#                    count1_string = str(State_var)+'-'+'49'+str(NAICS_var_2)
+#                    count = count + 1
+#                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range']
+#                else:
+#                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp']
+#        if count == 1:
+#            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#        if count > 1:
+#            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#            NAICS_var_2 = 0
+#            for NAICS_var_2 in range(10):
+#                if str(State_var)+"-48"+str(NAICS_var_2) in cbp_erange.index:
+#                    if ((cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'])==0):
+#                        cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+#                if str(State_var)+"-49"+str(NAICS_var_2) in cbp_erange.index: 
+#                    if ((cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'])==0):
+#                        cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+#    
+#    State_var = State_var + 1
+#
+##Four digit emp
+#State_var = 0 
+#while State_var < vcount:
+#    for i in nlist:
+#        for d in range(10):
+#            NAICS_var=str(i)+str(d)   
+#            NAICS_rest_sum = 0
+#            count = 0
+#            count1_string = ""
+#            flagsum = 0
+#            for NAICS_var_2 in range(10):
+#                if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
+#                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+#                        count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
+#                        count = count + 1
+#                        flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
+#                    else:
+#                        NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp']
+#            if count == 1:
+#                cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#            if count > 1:
+#                NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#                NAICS_var_2 = 0
+#                for NAICS_var_2 in range(10):
+#                    if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
+#                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+#                            cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+#    State_var = State_var + 1
+#
+##Five digit emp
+#State_var = 0 
+#while State_var < vcount:
+#    for i in nlist:
+#        for d in range(11,100):
+#            NAICS_var=str(i)+str(d)
+#            NAICS_rest_sum = 0
+#            count = 0
+#            count1_string = ""
+#            flagsum = 0
+#            for NAICS_var_2 in range(10):
+#                if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
+#                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+#                        count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
+#                        count = count + 1
+#                        flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
+#                    else:
+#                        NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp']
+#            if count == 1:
+#                cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#            if count > 1:
+#                NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#                for NAICS_var_2 in range(10):
+#                    if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
+#                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+#                            cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
+#    State_var = State_var + 1
+#
+#
+##Six digit emp
+#State_var = 0 
+#while State_var < vcount:
+#    for NAICS_var in naics_list6:   
+#        NAICS_rest_sum = 0
+#        count = 0
+#        count1_string = ""
+#        flagsum = 0
+#        for NAICS_var_2 in range(10):
+#            if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
+#                if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+#                    count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
+#                    count = count + 1
+#                    flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
+#                else:
+#                    NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp']
+#        if count == 1:
+#            cbp_erange.loc[count1_string,'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#        if count > 1:
+#            NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
+#            NAICS_var_2 = 0
+#            for NAICS_var_2 in range(10):
+#                if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
+#                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+#                        cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+#    State_var = State_var + 1
+#
+#t2=time.time()
+#total_time2=t2-t1
+#print(total_time2)    
 
 #Ap variable
 
