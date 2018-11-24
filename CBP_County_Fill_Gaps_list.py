@@ -111,24 +111,24 @@ cbp_erange.loc[cbp_erange['naics2'].isin(['45']),'naics2'] = '44'
 cbp_erange.loc[cbp_erange['naics2'].isin(['49']),'naics2'] = '48'
 
 
-dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
-dfl.columns = ['stctyid','naics_len','emp_sum','erange_sum']
-    
-dfl1=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
-dfl1.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
-
-dfl2=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
-dfl2.columns = ['stctyid','naics3','naics_len','emp_sum','erange_sum']
-
-dfl3=cbp_erange[['stctyid','naics4','naics_len','emp','e_range']].groupby(['stctyid','naics4','naics_len']).sum().reset_index()
-dfl3.columns = ['stctyid','naics4','naics_len','emp_sum','erange_sum']
-
-dfl4=cbp_erange[['stctyid','naics5','naics_len','emp','e_range']].groupby(['stctyid','naics5','naics_len']).sum().reset_index()
-dfl4.columns = ['stctyid','naics5','naics_len','emp_sum','erange_sum']
-
-dfl1[(dfl1['stctyid']==2)&(dfl1['naics2']=='11')].groupby(['stctyid','naics2']).count()
-dfl1[(dfl1['stctyid']==2)&(dfl1['naics2']=='11')&(dfl1['naics_len']==3)]['emp_sum']
-dfl1[(dfl1['stctyid']==2)&(dfl1['naics2']=='11')&(dfl1['naics_len']==3)]['emp_sum']
+#dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
+#dfl.columns = ['stctyid','naics_len','emp_sum','erange_sum']
+#    
+#dfl1=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
+#dfl1.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
+#
+#dfl2=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
+#dfl2.columns = ['stctyid','naics3','naics_len','emp_sum','erange_sum']
+#
+#dfl3=cbp_erange[['stctyid','naics4','naics_len','emp','e_range']].groupby(['stctyid','naics4','naics_len']).sum().reset_index()
+#dfl3.columns = ['stctyid','naics4','naics_len','emp_sum','erange_sum']
+#
+#dfl4=cbp_erange[['stctyid','naics5','naics_len','emp','e_range']].groupby(['stctyid','naics5','naics_len']).sum().reset_index()
+#dfl4.columns = ['stctyid','naics5','naics_len','emp_sum','erange_sum']
+#
+#dfl1[(dfl1['stctyid']==2)&(dfl1['naics2']=='11')].groupby(['stctyid','naics2']).count()
+#dfl1[(dfl1['stctyid']==2)&(dfl1['naics2']=='11')&(dfl1['naics_len']==3)]['emp_sum']
+#dfl1[(dfl1['stctyid']==2)&(dfl1['naics2']=='11')&(dfl1['naics_len']==3)]['emp_sum']
 #dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
 #dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']=='To')]
 
@@ -181,7 +181,7 @@ while State_var < vcount:
     State_var = State_var + 1
 
 for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
-    dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
+    dfl=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
     dfl.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
     dfl1=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
     dfl1.columns = ['stctyid','naics3','naics_len','emp_sum','erange_sum']
@@ -346,9 +346,9 @@ while State_var < vcount:
     State_var = State_var + 1
 
 for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
-    dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
+    dfl=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
     dfl.columns = ['stctyid','naics3','naics_len','emp_sum','erange_sum']
-    dfl1=cbp_erange[['stctyid','naics4','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
+    dfl1=cbp_erange[['stctyid','naics4','naics_len','emp','e_range']].groupby(['stctyid','naics4','naics_len']).sum().reset_index()
     dfl1.columns = ['stctyid','naics4','naics_len','emp_sum','erange_sum']
     if cbp_erange.loc[naics_code,'emp']==0:
         a = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl['naics_len']==4), 'emp_sum'].item()
@@ -394,7 +394,7 @@ while State_var < vcount:
     State_var = State_var + 1
 
 for naics_code in cbp_erange[cbp_erange['naics_len']==5].index:
-    dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics4','naics_len']).sum().reset_index()
+    dfl=cbp_erange[['stctyid','naics4','naics_len','emp','e_range']].groupby(['stctyid','naics4','naics_len']).sum().reset_index()
     dfl.columns = ['stctyid','naics4','naics_len','emp_sum','erange_sum']
     dfl1=cbp_erange[['stctyid','naics5','naics_len','emp','e_range']].groupby(['stctyid','naics5','naics_len']).sum().reset_index()
     dfl1.columns = ['stctyid','naics5','naics_len','emp_sum','erange_sum']
