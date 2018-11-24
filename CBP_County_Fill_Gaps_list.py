@@ -148,7 +148,7 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
             per = c/d
             e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
             f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-            if per*dif <= e:
+            if (per*dif <= e)&(dif!=0):
                 x = (e*d/dif)/(1-e/dif)
                 new_range = f + x
                 cbp_erange.loc[(naics_code),'e_range'] = new_range
@@ -194,7 +194,7 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
         per = c/d
         e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
         f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-        if per*dif <= e:
+        if (per*dif <= e)&(dif!=0):
             x = (e*d/dif)/(1-e/dif)
             new_range = f + x
             cbp_erange.loc[(naics_code),'e_range'] = new_range
@@ -359,7 +359,7 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
         per = c/d
         e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
         f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-        if per*dif <= e:
+        if (per*dif <= e)&(dif!=0):
             x = (e*d/dif)/(1-e/dif)
             new_range = f + x
             cbp_erange.loc[(naics_code),'e_range'] = new_range            
@@ -407,7 +407,7 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==5].index:
         per = c/d
         e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
         f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-        if per*dif <= e:
+        if (per*dif <= e)&(dif!=0):
             x = (e*d/dif)/(1-e/dif)
             new_range = f + x
             cbp_erange.loc[(naics_code),'e_range'] = new_range            
