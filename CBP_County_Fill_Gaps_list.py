@@ -96,7 +96,7 @@ for state_var in range(vcount):
             cbp_erange.loc[naics_code,'ap'] =(state_totals.loc[state_totals['fipstate']==state]['ap'].item()-df3.loc[state].item())*cbp_erange.loc[naics_code,'emp'] /df1.loc[state].item()
 
 #limit count to 50
-cbp_erange = cbp_erange[cbp_erange['stctyid']<=10]
+cbp_erange = cbp_erange[cbp_erange['stctyid']<=100]
 
 t0=time.time()
 
@@ -134,6 +134,7 @@ cbp_erange.loc[cbp_erange['naics2'].isin(['49']),'naics2'] = '48'
 
 #need to add measure for above sum being 0
 for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
+    naics_code = '48-23'
     if (cbp_erange.loc[naics_code,'naics2']!='99')&(cbp_erange.loc[naics_code,'naics2']!='To'):
         dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
         dfl.columns = ['stctyid','naics_len','emp_sum','erange_sum']
@@ -148,10 +149,15 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
             per = c/d
             e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
             f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+            g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
+            if (dif!=0)&((per*dif)-e<g):
+                e=e+g
             if (per*dif <= e)&(dif!=0):
                 x = (e*d/dif)/(1-e/dif)
                 new_range = f + x
-                cbp_erange.loc[(naics_code),'e_range'] = new_range
+                cbp_erange.loc[(naics_code),'e_range'] = new_range   
+                
+            dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
 
 #Two digit emp
 State_var = 1 
@@ -181,6 +187,7 @@ while State_var < vcount:
     State_var = State_var + 1
 
 for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
+    naics_code='48-236'
     dfl=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
     dfl.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
     dfl1=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
@@ -194,10 +201,14 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
         per = c/d
         e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
         f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+        g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
+        if (dif!=0)&((per*dif)-e<g):
+            e=e+g
         if (per*dif <= e)&(dif!=0):
             x = (e*d/dif)/(1-e/dif)
             new_range = f + x
-            cbp_erange.loc[(naics_code),'e_range'] = new_range
+            if new_range > 0:
+                cbp_erange.loc[(naics_code),'e_range'] = new_range     
 
 #Three digit emp
 State_var = 0 
@@ -359,10 +370,14 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
         per = c/d
         e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
         f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+        g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
+        if (dif!=0)&((per*dif)-e<g):
+            e=e+g
         if (per*dif <= e)&(dif!=0):
             x = (e*d/dif)/(1-e/dif)
             new_range = f + x
-            cbp_erange.loc[(naics_code),'e_range'] = new_range            
+            if new_range > 0:
+                cbp_erange.loc[(naics_code),'e_range'] = new_range            
 
 #Four digit emp
 State_var = 0 
@@ -407,10 +422,14 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==5].index:
         per = c/d
         e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
         f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
+        g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
+        if (dif!=0)&((per*dif)-e<g):
+            e=e+g
         if (per*dif <= e)&(dif!=0):
             x = (e*d/dif)/(1-e/dif)
             new_range = f + x
-            cbp_erange.loc[(naics_code),'e_range'] = new_range            
+            if new_range > 0:
+                cbp_erange.loc[(naics_code),'e_range'] = new_range               
 
 
 #Five digit emp
@@ -1113,7 +1132,7 @@ while State_var < vcount:
                         cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'ap'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] / flagsum * NAICS_rem 
     State_var = State_var + 1
 t3=time.time()
-total_time3=t3-t2
+total_time3=t3-t1
 total_time4=t3-t0
 print(total_time3)
 print(total_time4)
