@@ -96,8 +96,8 @@ for state_var in range(vcount):
             cbp_erange.loc[naics_code,'ap'] =(state_totals.loc[state_totals['fipstate']==state]['ap'].item()-df3.loc[state].item())*cbp_erange.loc[naics_code,'e_range'] /df2.loc[state].item()
 
 #limit count to 50
-#cbp_erange = cbp_erange[cbp_erange['stctyid']<=10]
-#vcount=cbp_erange["stctyid"].value_counts().count()+1
+cbp_erange = cbp_erange[cbp_erange['stctyid']<=500]
+vcount=cbp_erange["stctyid"].value_counts().count()+1
 
 t0=time.time()
 
@@ -156,9 +156,12 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
             if (dif!=0)&((per*dif)-e<g):
                 e=e+g
             if (per*dif <= e)&(dif!=0):
-                x = (e*d/dif)/(1-e/dif)
-                new_range = f + x
-                cbp_erange.loc[(naics_code),'e_range'] = new_range   
+                if dif == e:
+                    cbp_erange.loc[(naics_code),'e_range'] = d
+                else:
+                    x = (e*d/dif)/(1-e/dif)
+                    new_range = f + x
+                    cbp_erange.loc[(naics_code),'e_range'] = new_range   
                 
             dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
 
@@ -210,10 +213,13 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
         if (dif!=0)&((per*dif)-e<g):
             e=e+g
         if (per*dif <= e)&(dif!=0):
-            x = (e*d/dif)/(1-e/dif)
-            new_range = f + x
-            if new_range > 0:
-                cbp_erange.loc[(naics_code),'e_range'] = new_range     
+            if dif == e:
+                cbp_erange.loc[(naics_code),'e_range'] = d  
+            else:
+                x = (e*d/dif)/(1-e/dif)
+                new_range = f + x
+                if new_range > 0:
+                    cbp_erange.loc[(naics_code),'e_range'] = new_range     
 
 #Three digit emp
 State_var = 0 
@@ -382,10 +388,13 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
         if (dif!=0)&((per*dif)-e<g):
             e=e+g
         if (per*dif <= e)&(dif!=0):
-            x = (e*d/dif)/(1-e/dif)
-            new_range = f + x
-            if new_range > 0:
-                cbp_erange.loc[(naics_code),'e_range'] = new_range            
+            if dif == e:
+                cbp_erange.loc[(naics_code),'e_range'] = d  
+            else:
+                x = (e*d/dif)/(1-e/dif)
+                new_range = f + x
+                if new_range > 0:
+                    cbp_erange.loc[(naics_code),'e_range'] = new_range            
 
 #Four digit emp
 State_var = 0 
@@ -437,10 +446,13 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==5].index:
         if (dif!=0)&((per*dif)-e<g):
             e=e+g
         if (per*dif <= e)&(dif!=0):
-            x = (e*d/dif)/(1-e/dif)
-            new_range = f + x
-            if new_range > 0:
-                cbp_erange.loc[(naics_code),'e_range'] = new_range               
+            if dif == e:
+                cbp_erange.loc[(naics_code),'e_range'] = d  
+            else:
+                x = (e*d/dif)/(1-e/dif)
+                new_range = f + x
+                if new_range > 0:
+                    cbp_erange.loc[(naics_code),'e_range'] = new_range               
 
 
 #Five digit emp
@@ -1148,7 +1160,7 @@ total_time4=t3-t0
 print(total_time3)
 print(total_time4)
  #Export filled data
-cbp_erange.to_csv(path+'/cbp_erange_cty_t3.csv')
+cbp_erange.to_csv(path+'/cbp_erange_cty_1_500.csv')
 
 #Import complete dataset and filter out state and NAICS
 cbp_fill_state = pd.read_csv(path+'/cbp_erange_cty.csv')
