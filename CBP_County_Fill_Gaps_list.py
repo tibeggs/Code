@@ -86,17 +86,18 @@ state_var=1
 for state_var in range(vcount):
     naics_code=str(state_var)+"-Total"
     if naics_code in cbp_erange.index:
+        dfl=cbp_erange[['stctyid','naics_len','emp','ap','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
+        dfl.columns = ['stctyid','naics_len','emp_sum','ap_sum','erange_sum']
         if (cbp_erange.loc[naics_code,'emp']==0):
             state = cbp_erange.loc[naics_code,'fipstate']
-            state_code = str(state)+"-999"
             cbp_erange.loc[naics_code,'emp'] =(state_totals.loc[state_totals['fipstate']==state]['emp'].item()-df1.loc[state].item())*cbp_erange.loc[naics_code,'e_range'] /df2.loc[state].item()
         if (cbp_erange.loc[naics_code,'ap']==0):
             state = cbp_erange.loc[naics_code,'fipstate']
-            state_code = str(state)+"-999"
-            cbp_erange.loc[naics_code,'ap'] =(state_totals.loc[state_totals['fipstate']==state]['ap'].item()-df3.loc[state].item())*cbp_erange.loc[naics_code,'emp'] /df1.loc[state].item()
+            cbp_erange.loc[naics_code,'ap'] =(state_totals.loc[state_totals['fipstate']==state]['ap'].item()-df3.loc[state].item())*cbp_erange.loc[naics_code,'e_range'] /df2.loc[state].item()
 
 #limit count to 50
-cbp_erange = cbp_erange[cbp_erange['stctyid']<=100]
+#cbp_erange = cbp_erange[cbp_erange['stctyid']<=10]
+#vcount=cbp_erange["stctyid"].value_counts().count()+1
 
 t0=time.time()
 
@@ -134,7 +135,6 @@ cbp_erange.loc[cbp_erange['naics2'].isin(['49']),'naics2'] = '48'
 
 #need to add measure for above sum being 0
 for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
-    naics_code = '48-23'
     if (cbp_erange.loc[naics_code,'naics2']!='99')&(cbp_erange.loc[naics_code,'naics2']!='To'):
         dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
         dfl.columns = ['stctyid','naics_len','emp_sum','erange_sum']
@@ -190,7 +190,6 @@ while State_var < vcount:
     State_var = State_var + 1
 
 for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
-    naics_code='48-236'
     dfl=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
     dfl.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
     dfl1=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
