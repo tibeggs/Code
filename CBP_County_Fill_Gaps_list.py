@@ -26,7 +26,7 @@ cbp_erange = pd.merge(cbp, erange,how='left',on='empflag')
 cbp_erange["fipsstcty"]=cbp_erange["fipstate"].astype(str)+"-"+cbp_erange["fipscty"].astype(str)
 cbp_erange["stctyid"]=cbp_erange["fipsstcty"].rank(method='dense').astype(int)
 
-
+cutoff=1
 
 #cbp_erange=cbp_erange[cbp_erange["stctyid"]<=100]
 
@@ -96,7 +96,7 @@ for state_var in range(vcount):
             cbp_erange.loc[naics_code,'ap'] =(state_totals.loc[state_totals['fipstate']==state]['ap'].item()-df3.loc[state].item())*cbp_erange.loc[naics_code,'e_range'] /df2.loc[state].item()
 
 #limit count to 50
-cbp_erange = cbp_erange[cbp_erange['stctyid']<=500]
+cbp_erange = cbp_erange[cbp_erange['stctyid']<=cutoff]
 vcount=cbp_erange["stctyid"].value_counts().count()+1
 
 t0=time.time()
@@ -510,128 +510,6 @@ while State_var < vcount:
                     if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
                         cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
     State_var = State_var + 1
-#           
-#                try:
-#                    test_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    flag_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    above_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']=='To') & (dfl1['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    line_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    range_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-#                except:
-#                    'fail'
-
-#
-#for naics_code in cbp_erange.index:
-#    naics_code='2-44314'
-#    if cbp_erange.loc[naics_code,'emp']==0:
-#        if cbp_erange.loc[naics_code,'naics_len']<=5:
-#            if cbp_erange.loc[naics_code,'naics_len']==2:
-#                try:
-#                    test_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    flag_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid'])) & (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    above_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']=='To') & (dfl1['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    line_sum=dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    range_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-#                except:
-#                    'fail'
-#
-#            if cbp_erange.loc[naics_code,'naics_len']==3:
-#                try:
-#                    test_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    flag_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    above_sum=dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl1['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    line_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    range_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-#                except:
-#                    'fail'
-#                    
-#                    
-#            if cbp_erange.loc[naics_code,'naics_len']==4:
-#                try:
-#                    test_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    flag_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    above_sum=dfl2.loc[(dfl2['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl2['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl2['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    line_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    range_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-#                except:
-#                    'fail'
-#            if cbp_erange.loc[naics_code,'naics_len']==5:
-#                try:
-#                    test_sum=dfl4.loc[(dfl4['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl4['naics5']==(cbp_erange.loc[(naics_code),'naics5'])) & (dfl4['naics_len']-1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    flag_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'erange_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    above_sum=dfl3.loc[(dfl3['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl3['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl3['naics_len']+1==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    line_sum=dfl4.loc[(dfl4['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl4['naics5']==(cbp_erange.loc[(naics_code),'naics5'])) & (dfl4['naics_len']==(cbp_erange.loc[(naics_code),'naics_len'])), 'emp_sum'].item()
-#                except:
-#                    'fail'
-#                try:
-#                    range_sum=dfl4.loc[(dfl4['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl4['naics5']==(cbp_erange.loc[(naics_code),'naics5'])) & (dfl4['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-#                except:
-#                    'fail'
-#
-#                    
-#            try:
-#                if cbp_erange.loc[(naics_code),'e_range']/flag_sum*(above_sum-line_sum)<=test_sum:
-#                    x = (test_sum*flag_sum/(above_sum-line_sum))/(1-(test_sum/(above_sum-line_sum)))
-#                    cbp_erange.loc[(naics_code),'e_range'] = range_sum + x
-#            except:
-#                'fail'
 
 t1=time.time()
 total_time=t1-t0
@@ -1160,10 +1038,10 @@ total_time4=t3-t0
 print(total_time3)
 print(total_time4)
  #Export filled data
-cbp_erange.to_csv(path+'/cbp_erange_cty_1_500.csv')
+cbp_erange.to_csv(path+'/cbp_erange_cty_1_300.csv')
 
 #Import complete dataset and filter out state and NAICS
-cbp_fill_state = pd.read_csv(path+'/cbp_erange_cty.csv')
-#cbp_fill_state['fipstate'] = cbp_fill_state['cty_naics'].apply(lambda x: x.split('-')[0])
-cbp_fill_state['naics'] = cbp_fill_state['cty_naics'].apply(lambda x: x.split('-')[1])
-cbp_fill_state.to_csv(path+'/cbp_fill_state.csv')
+#cbp_fill_state = pd.read_csv(path+'/cbp_erange_cty.csv')
+##cbp_fill_state['fipstate'] = cbp_fill_state['cty_naics'].apply(lambda x: x.split('-')[0])
+#cbp_fill_state['naics'] = cbp_fill_state['cty_naics'].apply(lambda x: x.split('-')[1])
+#cbp_fill_state.to_csv(path+'/cbp_fill_state.csv')
