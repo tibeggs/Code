@@ -101,7 +101,7 @@ cbp_erange_clean= cbp_erange
 
 #limit count to 50
 cutoff=100
-cutofft=150
+cutofft=200
 cbp_erange = cbp_erange_clean[(cbp_erange_clean['stctyid']>cutoff)&(cbp_erange_clean['stctyid']<=cutofft)]
 vcount=cbp_erange["stctyid"].value_counts().count()+1
 
@@ -145,6 +145,7 @@ cbp_erange.loc[cbp_erange['naics2'].isin(['49']),'naics2'] = '48'
 
 #need to add measure for above sum being 0
 for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
+    naics_code='102-71'
     if (cbp_erange.loc[naics_code,'naics2']!='99')&(cbp_erange.loc[naics_code,'naics2']!='To'):
         dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
         dfl.columns = ['stctyid','naics_len','emp_sum','erange_sum']
@@ -164,19 +165,19 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
             except:
                 g = 0
             if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<g):
-                e=e+g
+                e=e+(g-((per*dif)-e))
             try:
                 h = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+3)), 'emp_sum'].item()
             except:
                 h = 0
             if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<h):
-                e=e+h
+                e=e+(h-((per*dif)-e))
             try:
                 i = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+4)), 'emp_sum'].item()
             except:
                 i = 0
             if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<i):
-                e=e+i
+                e=e+(i-((per*dif)-e))
             if (per*dif <= e)&(dif!=0):
                 if dif == e:
                     cbp_erange.loc[(naics_code),'e_range'] = d
@@ -233,13 +234,13 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
         except:
             g = 0
         if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<g):
-            e=e+g
+            e=e+(g-((per*dif)-e))
         try:
             h = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+3)), 'emp_sum'].item()
         except:
             h = 0
         if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<h):
-            e=e+h
+            e=e+(h-((per*dif)-e))
         if (per*dif <= e)&(dif!=0):
             if dif == e:
                 cbp_erange.loc[(naics_code),'e_range'] = d  
@@ -412,7 +413,7 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
         except:
             g=0
         if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<g):
-            e=e+g
+            e=e+(g-((per*dif)-e))
         if (per*dif <= e)&(dif!=0):
             if dif == e:
                 cbp_erange.loc[(naics_code),'e_range'] = d  
