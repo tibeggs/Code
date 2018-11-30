@@ -108,6 +108,9 @@ cutoff=100
 cutofft=150
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
+=======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
 =======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
@@ -161,6 +164,9 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
                 e=e+g
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
+=======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
 =======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
@@ -178,6 +184,9 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
                 e=e+h
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
+=======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
 =======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
@@ -195,6 +204,9 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
                 e=e+i
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
+=======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
 =======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
@@ -263,6 +275,9 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
             e=e+g
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
+=======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
 =======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
@@ -280,6 +295,9 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
             e=e+h
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
+=======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
 =======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
@@ -464,6 +482,9 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
             e=e+g
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
+=======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
 =======
 >>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
