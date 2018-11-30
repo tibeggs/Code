@@ -100,19 +100,8 @@ for state_var in range(vcount):
 cbp_erange_clean= cbp_erange
 
 #limit count to 50
-<<<<<<< HEAD
-cutoff=0
-cutofft=250
-=======
 cutoff=100
-cutofft=150
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
+cutofft=105
 cbp_erange = cbp_erange_clean[(cbp_erange_clean['stctyid']>cutoff)&(cbp_erange_clean['stctyid']<=cutofft)]
 vcount=cbp_erange["stctyid"].value_counts().count()+1
 
@@ -153,62 +142,30 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
                 g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
             except:
                 g = 0
-<<<<<<< HEAD
-            if e<g:
+            if (g>e):
                 e=g
-=======
-            if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<g):
-                e=e+g
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
             try:
                 h = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+3)), 'emp_sum'].item()
             except:
                 h = 0
-<<<<<<< HEAD
-            if e<h:
+            if (h>g):
                 e=h
-=======
-            if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<h):
-                e=e+h
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
             try:
                 i = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+4)), 'emp_sum'].item()
             except:
                 i = 0
-<<<<<<< HEAD
-            if i<e:
+            if (i>e):
                 e=i
-=======
-            if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<i):
-                e=e+i
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-            if (per*dif <= e)&(dif!=0):
-                if dif == e:
-                    cbp_erange.loc[(naics_code),'e_range'] = d
-                else:
-                    x = (e*d/dif)/(1-e/dif)
-                    new_range = f/4 + x
-                    cbp_erange.loc[(naics_code),'e_range'] = new_range   
+            cbp_erange.loc[(naics_code),'e_range'] = e/dif  
+#            if (per*dif <= e)&(dif!=0):
+#                if dif == e:
+#                    cbp_erange.loc[(naics_code),'e_range'] = d
+#                else:
+#                    x = (e*d/dif)/(1-e/dif)
+#                    new_range = f/4 + x
+#                    cbp_erange.loc[(naics_code),'e_range'] = new_range   
                 
-            dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
+
 
 #Two digit emp
 State_var = 1 
@@ -252,47 +209,26 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
         e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
         f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
         try:
-            g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
+            g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
         except:
             g = 0
-<<<<<<< HEAD
-        if e<g:
+        if (g>e):
             e=g
-=======
-        if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<g):
-            e=e+g
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
         try:
             h = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+3)), 'emp_sum'].item()
         except:
             h = 0
-<<<<<<< HEAD
-        if e<h:
+        if (h>g):
             e=h
-=======
-        if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<h):
-            e=e+h
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-        if (per*dif <= e)&(dif!=0):
-            if dif == e:
-                cbp_erange.loc[(naics_code),'e_range'] = d  
-            else:
-                x = (e*d/dif)/(1-e/dif)
-                new_range = f/4 + x
-                if new_range > 0:
-                    cbp_erange.loc[(naics_code),'e_range'] = new_range     
+        cbp_erange.loc[(naics_code),'e_range'] = e/dif  
+#        if (per*dif <= e)&(dif!=0):
+#            if dif == e:
+#                cbp_erange.loc[(naics_code),'e_range'] = d  
+#            else:
+#                x = (e*d/dif)/(1-e/dif)
+#                new_range = f/4 + x
+#                if new_range > 0:
+#                    cbp_erange.loc[(naics_code),'e_range'] = new_range     
 
 #Three digit emp
 State_var = 0 
@@ -453,30 +389,20 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
         e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
         f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
         try:
-            g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
+            g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
         except:
-            g=0
-<<<<<<< HEAD
-        if e<g:
+            g = 0
+        if (g>e):
             e=g
-=======
-        if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<g):
-            e=e+g
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-        if (per*dif <= e)&(dif!=0):
-            if dif == e:
-                cbp_erange.loc[(naics_code),'e_range'] = d  
-            else:
-                x = (e*d/dif)/(1-e/dif)
-                new_range = f/4 + x
-                if new_range > 0:
-                    cbp_erange.loc[(naics_code),'e_range'] = new_range            
+        cbp_erange.loc[(naics_code),'e_range'] = e/dif  
+#        if (per*dif <= e)&(dif!=0):
+#            if dif == e:
+#                cbp_erange.loc[(naics_code),'e_range'] = d  
+#            else:
+#                x = (e*d/dif)/(1-e/dif)
+#                new_range = f/4 + x
+#                if new_range > 0:
+#                    cbp_erange.loc[(naics_code),'e_range'] = new_range            
 
 #Four digit emp
 State_var = 0 
@@ -521,14 +447,15 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==5].index:
         per = c/d
         e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
         f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-        if (per*dif <= e)&(dif!=0):
-            if dif == e:
-                cbp_erange.loc[(naics_code),'e_range'] = d  
-            else:
-                x = (e*d/dif)/(1-e/dif)
-                new_range = f/4 + x
-                if new_range > 0:
-                    cbp_erange.loc[(naics_code),'e_range'] = new_range               
+        cbp_erange.loc[(naics_code),'e_range'] = e/dif  
+#        if (per*dif <= e)&(dif!=0):
+#            if dif == e:
+#                cbp_erange.loc[(naics_code),'e_range'] = d  
+#            else:
+#                x = (e*d/dif)/(1-e/dif)
+#                new_range = f/4 + x
+#                if new_range > 0:
+#                    cbp_erange.loc[(naics_code),'e_range'] = new_range               
 
 
 #Five digit emp
