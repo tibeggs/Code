@@ -101,7 +101,7 @@ cbp_erange_clean= cbp_erange
 
 #limit count to 50
 cutoff=0
-cutofft=250
+cutofft=100
 
 cbp_erange = cbp_erange_clean[(cbp_erange_clean['stctyid']>cutoff)&(cbp_erange_clean['stctyid']<=cutofft)]
 vcount=cbp_erange["stctyid"].value_counts().count()+1
@@ -149,8 +149,8 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
                 h = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+3)), 'emp_sum'].item()
             except:
                 h = 0
-            if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<H):
-                e=e+(H-((per*dif)-e))
+            if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<h):
+                e=e+(h-((per*dif)-e))
             try:
                 i = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+4)), 'emp_sum'].item()
             except:
