@@ -100,22 +100,9 @@ for state_var in range(vcount):
 cbp_erange_clean= cbp_erange
 
 #limit count to 50
-<<<<<<< HEAD
 cutoff=0
 cutofft=250
-=======
-cutoff=100
-cutofft=150
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
-=======
->>>>>>> parent of 97cd1a6... Update CBP_County_Fill_Gaps_list.py
+
 cbp_erange = cbp_erange_clean[(cbp_erange_clean['stctyid']>cutoff)&(cbp_erange_clean['stctyid']<=cutofft)]
 vcount=cbp_erange["stctyid"].value_counts().count()+1
 
