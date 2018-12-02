@@ -31,6 +31,7 @@ for filename in filelists:
     df1=df1[df1['clean_flag']==1]
     df2= df.loc[df['stctyid'].isin(df1['stctyid'])]
     df2.loc[(df2['naics']!='Total')&(df2['e_range'].notna()),'emp']=0
+    df2.loc[df2['emp'].isna(),'emp']=0
     df2.loc[df2['e_range']<0,'e_range']=0   
     df3= df.loc[~df['stctyid'].isin(df1['stctyid'])]
     df3.to_csv(cleanpath+"/sucess_"+filename)
