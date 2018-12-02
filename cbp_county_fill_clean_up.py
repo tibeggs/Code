@@ -30,11 +30,12 @@ for filename in filelists:
     df1.loc[df1['clean_flag']>1,'clean_flag']=1
     df1=df1[df1['clean_flag']==1]
     df2= df.loc[df['stctyid'].isin(df1['stctyid'])]
-    df2.loc[df2['naics']!='Total','emp']=0
-    df2.loc[df2['e_range']<0]=0   
+    df2.loc[(df2['naics']!='Total')&(df2['e_range'].notna()),'emp']=0
+    df2.loc[df2['e_range']<0,'e_range']=0   
     df3= df.loc[~df['stctyid'].isin(df1['stctyid'])]
     df3.to_csv(cleanpath+"/sucess_"+filename)
     cbp_erange=df2
+    cbp_erange.set_index('cty_naics',inplace=True)
    
     cutoff=cbp_erange['stctyid'].min()
     cutofft=cbp_erange['stctyid'].max()
@@ -43,23 +44,21 @@ for filename in filelists:
     naics_list5=set(cbp_erange['naics'][cbp_erange['naics'].str.len()==6].str[:4])
     naics_list6=set(cbp_erange['naics'][cbp_erange['naics'].str.len()==6].str[:5])
     
-    state_range=list(range(cutoff,cutofft))
-    
-    
-    
+    state_range=df1['stctyid']
+    #list(range(cutoff,cutofft))
+   
     t0=time.time()
-    
-    cbp_erange['naics2'] = cbp_erange['naics'].str[:2]
-    cbp_erange['naics3'] = cbp_erange['naics'].str[:3]
-    cbp_erange['naics4'] = cbp_erange['naics'].str[:4]
-    cbp_erange['naics5'] = cbp_erange['naics'].str[:5]
-    
-    cbp_erange.loc[cbp_erange['naics2'].isin(['32','33']),'naics2'] = '31'
-    cbp_erange.loc[cbp_erange['naics2'].isin(['43']),'naics2'] = '42'
-    cbp_erange.loc[cbp_erange['naics2'].isin(['45']),'naics2'] = '44'
-    cbp_erange.loc[cbp_erange['naics2'].isin(['49']),'naics2'] = '48'
-    
-    
+#    
+#    cbp_erange['naics2'] = cbp_erange['naics'].str[:2]
+#    cbp_erange['naics3'] = cbp_erange['naics'].str[:3]
+#    cbp_erange['naics4'] = cbp_erange['naics'].str[:4]
+#    cbp_erange['naics5'] = cbp_erange['naics'].str[:5]
+#    
+#    cbp_erange.loc[cbp_erange['naics2'].isin(['32','33']),'naics2'] = '31'
+#    cbp_erange.loc[cbp_erange['naics2'].isin(['43']),'naics2'] = '42'
+#    cbp_erange.loc[cbp_erange['naics2'].isin(['45']),'naics2'] = '44'
+#    cbp_erange.loc[cbp_erange['naics2'].isin(['49']),'naics2'] = '48'
+       
     #need to add measure for above sum being 0
     for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
         if (cbp_erange.loc[naics_code,'naics2']!='99')&(cbp_erange.loc[naics_code,'naics2']!='To'):
@@ -135,7 +134,7 @@ for filename in filelists:
     
     t22 = time.time()
     print(t22-t21)
-    
+  
     for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
         dfl=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
         dfl.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
@@ -645,6 +644,7 @@ for filename in filelists:
     
     #Four digit ap
      
+
     for State_var in state_range:
         for i in nlist:
             for d in range(10):
