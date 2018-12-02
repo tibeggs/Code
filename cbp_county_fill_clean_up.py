@@ -32,12 +32,12 @@ for filename in filelists:
     df2= df.loc[df['stctyid'].isin(df1['stctyid'])]
     df2.loc[(df2['naics']!='Total')&(df2['e_range'].notna()),'emp']=0
     df2.loc[df2['emp'].isna(),'emp']=0
+    df2.loc[(df2['emp']==0)&df2['e_range'].isna(),'e_range']=0
     df2.loc[df2['e_range']<0,'e_range']=0   
     df3= df.loc[~df['stctyid'].isin(df1['stctyid'])]
     df3.to_csv(cleanpath+"/sucess_"+filename)
     cbp_erange=df2
     cbp_erange.set_index('cty_naics',inplace=True)
-   
     cutoff=cbp_erange['stctyid'].min()
     cutofft=cbp_erange['stctyid'].max()
     vcount=cbp_erange["stctyid"].value_counts().count()+1
