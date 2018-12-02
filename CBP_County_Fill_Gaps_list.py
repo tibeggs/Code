@@ -100,8 +100,8 @@ for state_var in range(vcount):
 cbp_erange_clean= cbp_erange
 
 #limit count to 50
-cutoff=0
-cutofft=100
+cutoff=2000
+cutofft=2250
 
 cbp_erange = cbp_erange_clean[(cbp_erange_clean['stctyid']>cutoff)&(cbp_erange_clean['stctyid']<=cutofft)]
 vcount=cbp_erange["stctyid"].value_counts().count()+1
@@ -167,6 +167,9 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
                 
             dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
 
+t21 = time.time()
+print(t21-t0)
+
 #Two digit emp
 State_var = 1 
 for State_var in state_range:
@@ -192,6 +195,9 @@ for State_var in state_range:
             if str(State_var)+"-"+str(NAICS_var) in cbp_erange.index:
                 if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'])==0):
                     cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range'] / flagsum * NAICS_rem
+
+t22 = time.time()
+print(t22-t21)
 
 for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
     dfl=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
@@ -227,7 +233,11 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
                 x = (e*d/dif)/(1-e/dif)
                 new_range = f/4 + x
                 if new_range > 0:
-                    cbp_erange.loc[(naics_code),'e_range'] = new_range     
+                    cbp_erange.loc[(naics_code),'e_range'] = new_range  
+                    
+
+t31 = time.time()
+print(t31-t22)
 
 #Three digit emp
 State_var = 0 
@@ -372,6 +382,9 @@ for State_var in state_range:
                     if ((cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'])==0):
                         cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
     
+t32 = time.time()
+print(t32-t31)
+
 
 for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
     dfl=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
@@ -402,6 +415,9 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
                 if new_range > 0:
                     cbp_erange.loc[(naics_code),'e_range'] = new_range            
 
+t41 = time.time()
+print(t41-t32)
+
 #Four digit emp
 State_var = 0 
 for State_var in state_range:
@@ -429,7 +445,9 @@ for State_var in state_range:
                     if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
                         if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
                             cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
-    State_var = State_var + 1
+
+t42 = time.time()
+print(t42-t41)
 
 for naics_code in cbp_erange[cbp_erange['naics_len']==5].index:
     dfl=cbp_erange[['stctyid','naics4','naics_len','emp','e_range']].groupby(['stctyid','naics4','naics_len']).sum().reset_index()
@@ -454,6 +472,8 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==5].index:
                 if new_range > 0:
                     cbp_erange.loc[(naics_code),'e_range'] = new_range               
 
+t51 = time.time()
+print(t51-t42)
 
 #Five digit emp
 
@@ -483,6 +503,8 @@ for State_var in state_range:
                             cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
 
 
+t52 = time.time()
+print(t52-t51)
 #Six digit emp
  
 for State_var in state_range:
@@ -510,9 +532,12 @@ for State_var in state_range:
                         cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
 
 
+t61 = time.time()
+print(t61-t52)
+
 t1=time.time()
 total_time=t1-t0
-print(total_time)  
+print('emp took '+str(total_time))  
 
 #Ap variable
 

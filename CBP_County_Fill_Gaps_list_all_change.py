@@ -9,7 +9,7 @@ Created on Tue Nov 13 10:33:13 2018
 import pandas as pd
 import time
 
-
+t0=time.time()
 
 #Import cbp state data
 path = "M:\\TSA\\c.tasks\\Task 17 UpdatingRegDatabasePhase2\\Python\\Geo_Datasets"
@@ -99,6 +99,10 @@ for state_var in range(vcount):
 
 cbp_erange_clean= cbp_erange
 
+#t2=time.time()
+#total_time2=t2-t0
+#print(total_time2)    
+
 #limit count to 50
 cutoff=100
 cutofft=105
@@ -156,6 +160,9 @@ for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
                 i = 0
             if (i>e):
                 e=i
+            if e == 0:
+                e=
+                
             cbp_erange.loc[(naics_code),'e_range'] = e/dif  
 #            if (per*dif <= e)&(dif!=0):
 #                if dif == e:
