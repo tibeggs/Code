@@ -19,7 +19,7 @@ n4list=[44]
 n5list=[48]
 
 filelist=os.listdir(path)
-filelists=filelist[0]
+filelists=[filelist[0]]
 
 for filename in filelists:
     df = pd.read_csv(path+"/"+filename)
