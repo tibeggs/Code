@@ -8,8 +8,8 @@ import os
 import pandas as pd
 import time
 
-path = "M:\\TSA\\c.tasks\\Task 17 UpdatingRegDatabasePhase2\\Python\\Geo_Datasets\\county_sub_files"
-cleanpath = "M:\\TSA\\c.tasks\\Task 17 UpdatingRegDatabasePhase2\\Python\\Geo_Datasets\\\county_sub_files_clean"
+path = "C:\\Users\\tibeg\\Desktop\\geo_data\\sub_files"
+cleanpath = "C:\\Users\\tibeg\\Desktop\\geo_data\\clean_sub_files"
 
 nlist = [11, 21, 22, 23, 31, 32, 33, 42, 44, 45, 48, 49, 51, 52, 53, 54, 55, 56, 61, 62, 71, 72, 81, 99]
 n1list = [11, 21, 22, 23, 42, 51, 52, 53, 54, 55, 56, 61, 62, 71, 72, 81, 99]
@@ -19,7 +19,7 @@ n4list=[44]
 n5list=[48]
 
 filelist=os.listdir(path)
-filelists=[filelist[0]]
+filelists=[filelist[1]]
 
 for filename in filelists:
     df = pd.read_csv(path+"/"+filename)
