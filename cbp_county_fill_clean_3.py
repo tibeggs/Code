@@ -33,15 +33,21 @@ for filename in filelists:
     df1.loc[df1['clean_flag']>1,'clean_flag']=1
     df1=df1[df1['clean_flag']==1]
     df2= df.loc[df['stctyid'].isin(df1['stctyid'])]
-    for i in df2.loc[df2['emp']<0,'cty_naics']:
-        code=i[:-1]
-        org = df2.loc[df2['cty_naics']==code, 'emp']
-        df2.loc[df2['cty_naics']==code, 'emp']=(df2.loc[df2['cty_naics']==i, 'emp']*-1).item()+org
-        df2.loc[df2['cty_naics']==code, 'e_range']=np.NaN    
     df2.loc[(df2['naics']!='Total')&(df2['e_range'].notna()),'emp']=0
     df2.loc[df2['emp'].isna(),'emp']=0
     df2.loc[(df2['emp']==0)&df2['e_range'].isna(),'e_range']=0
     df2.loc[df2['e_range']<0,'e_range']=0   
+    df2.sort_values(['stctyid','naics_len'], ascending=False)
+    for i in df2.loc[(df2['emp']>0)&(df2['naics_len']>2),'cty_naics']:
+        code=i[:-1]
+        cu=df2.loc[df2['cty_naics']==i,'emp'].item()
+        try:
+            up=df2.loc[df2['cty_naics']==code,'emp'].item()
+        except:
+            up=0
+        if up < cu:
+            org=df2.loc[df2['cty_naics']==code,'emp']
+            df2.loc[df2['cty_naics']==code,'emp']=org+(df2.loc[df2['cty_naics']==i, 'emp'].item())    
     df3= df.loc[~df['stctyid'].isin(df1['stctyid'])]
     df3.to_csv(cleanpath+"/sucess_"+filename)
     cbp_erange=df2
@@ -125,7 +131,7 @@ for filename in filelists:
         flagsum = 0    
         for NAICS_var in nlist:
             if str(State_var)+"-"+str(NAICS_var) in cbp_erange.index:
-                if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'])==0):
+                if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range'])!=0):
                     count1_string = str(State_var)+'-'+str(NAICS_var)
                     count = count + 1
                     flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range']
@@ -138,8 +144,10 @@ for filename in filelists:
             NAICS_rem = cbp_erange.loc[str(State_var)+'-Total','emp'] - NAICS_rest_sum
             for NAICS_var in nlist:
                 if str(State_var)+"-"+str(NAICS_var) in cbp_erange.index:
-                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'])==0):
-                        cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range'] / flagsum * NAICS_rem
+                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range'])!=0):
+                        new = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range'] / flagsum * NAICS_rem
+                        if new > cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'].item():
+                            cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'e_range'] / flagsum * NAICS_rem
     
     t22 = time.time()
     print(t22-t21)
@@ -195,7 +203,7 @@ for filename in filelists:
             flagsum = 0
             for NAICS_var_2 in range(10):
                 if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
-                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'])!=0):
                             count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
                             count = count + 1
                             flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
@@ -208,8 +216,10 @@ for filename in filelists:
                 NAICS_var_2 = 0
                 for NAICS_var_2 in range(10):
                     if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
-                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
+                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'])!=0):
+                            new = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if new >  cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'].item():
+                                cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
     
       
         #NAICS 31-33
@@ -220,21 +230,21 @@ for filename in filelists:
             flagsum = 0
             for NAICS_var_2 in range(10):
                 if str(State_var)+"-31"+str(NAICS_var_2) in cbp_erange.index:   
-                    if ((cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'])==0):
+                    if ((cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range'])!=0):
                         count1_string = str(State_var)+'-'+'31'+str(NAICS_var_2)
                         count = count + 1
                         flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range']
                     else:
                         NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp']
                 if str(State_var)+"-32"+str(NAICS_var_2) in cbp_erange.index:  
-                    if ((cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'])==0):
+                    if ((cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range'])!=0):
                         count1_string = str(State_var)+'-'+'32'+str(NAICS_var_2)
                         count = count + 1
                         flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range']
                     else:
                         NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp']
                 if str(State_var)+"-33"+str(NAICS_var_2) in cbp_erange.index:  
-                    if ((cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'])==0):
+                    if ((cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range'])!=0):
                         count1_string = str(State_var)+'-'+'33'+str(NAICS_var_2)
                         count = count + 1
                         flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range']
@@ -248,16 +258,22 @@ for filename in filelists:
                 NAICS_var_2 = 0
                 for NAICS_var_2 in range(10):
                     if str(State_var)+"-31"+str(NAICS_var_2) in cbp_erange.index: 
-                        if ((cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                        if ((cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range'])!=0):
+                            new = cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if new > cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'].item():
+                                cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'31'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
     
                     if str(State_var)+"-32"+str(NAICS_var_2) in cbp_erange.index: 
-                        if ((cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                        if ((cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range'])!=0):
+                            new = cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if new >cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'].item():
+                                cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'32'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
       
                     if str(State_var)+"-33"+str(NAICS_var_2) in cbp_erange.index:  
-                        if ((cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                        if ((cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range'])!=0):
+                            new = cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if new >cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'].item():
+                                cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'33'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
     
         #NAICS 44-45
         for NAICS_var in n4list:
@@ -267,14 +283,14 @@ for filename in filelists:
             flagsum = 0
             for NAICS_var_2 in range(10):
                 if str(State_var)+"-44"+str(NAICS_var_2) in cbp_erange.index:  
-                    if ((cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'])==0):
+                    if ((cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range'])!=0):
                         count1_string = str(State_var)+'-'+'44'+str(NAICS_var_2)
                         count = count + 1                    
                         flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range']
                     else:
                         NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp']
                 if str(State_var)+"-45"+str(NAICS_var_2) in cbp_erange.index:  
-                    if ((cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'])==0):
+                    if ((cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range'])!=0):
                         count1_string = str(State_var)+'-'+'45'+str(NAICS_var_2)
                         count = count + 1
                         flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range']
@@ -287,11 +303,15 @@ for filename in filelists:
                 NAICS_var_2 = 0
                 for NAICS_var_2 in range(10):
                     if str(State_var)+"-44"+str(NAICS_var_2) in cbp_erange.index: 
-                        if ((cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                        if ((cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range'])!=0):
+                            new = cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if new > cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'].item():
+                                cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'44'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
                     if str(State_var)+"-45"+str(NAICS_var_2) in cbp_erange.index:  
-                        if ((cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem   
+                        if ((cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range'])!=0):
+                            new = cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if new> cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'].item():
+                                cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'45'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem   
     
         #NAICS 48-49
         for NAICS_var in n5list:
@@ -301,14 +321,14 @@ for filename in filelists:
             flagsum = 0
             for NAICS_var_2 in range(10):
                 if str(State_var)+"-48"+str(NAICS_var_2) in cbp_erange.index:
-                    if ((cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'])==0):
+                    if ((cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range'])!=0):
                         count1_string = str(State_var)+'-'+'48'+str(NAICS_var_2)
                         count = count + 1                    
                         flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range']
                     else:
                         NAICS_rest_sum = NAICS_rest_sum + cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp']
                 if str(State_var)+"-49"+str(NAICS_var_2) in cbp_erange.index: 
-                    if ((cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'])==0):
+                    if ((cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range'])!=0):
                         count1_string = str(State_var)+'-'+'49'+str(NAICS_var_2)
                         count = count + 1
                         flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range']
@@ -321,11 +341,15 @@ for filename in filelists:
                 NAICS_var_2 = 0
                 for NAICS_var_2 in range(10):
                     if str(State_var)+"-48"+str(NAICS_var_2) in cbp_erange.index:
-                        if ((cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                        if ((cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range'])!=0):
+                            new = cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if new > cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'].item():
+                                cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'48'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
                     if str(State_var)+"-49"+str(NAICS_var_2) in cbp_erange.index: 
-                        if ((cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'])==0):
-                            cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                        if ((cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range'])!=0):
+                            new = cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if new > cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'].item():
+                                cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+'49'+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
         
     t32 = time.time()
     print(t32-t31)
@@ -375,7 +399,7 @@ for filename in filelists:
                 flagsum = 0
                 for NAICS_var_2 in range(10):
                     if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
-                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'])!=0):
                             count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
                             count = count + 1
                             flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
@@ -388,8 +412,10 @@ for filename in filelists:
                     NAICS_var_2 = 0
                     for NAICS_var_2 in range(10):
                         if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index:
-                            if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                                cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'])!=0):
+                                new = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                                if new > cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'].item()
+                                    cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
     
     t42 = time.time()
     print(t42-t41)
@@ -432,7 +458,7 @@ for filename in filelists:
                 flagsum = 0
                 for NAICS_var_2 in range(10):
                     if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
-                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'])!=0):
                             count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
                             count = count + 1
                             flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
@@ -444,8 +470,10 @@ for filename in filelists:
                     NAICS_rem = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var),'emp'] - NAICS_rest_sum
                     for NAICS_var_2 in range(10):
                         if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
-                            if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
-                                cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
+                            if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'])!=0):
+                                new = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
+                                if new > cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'].item():
+                                    cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem 
     
     
     t52 = time.time()
@@ -460,7 +488,7 @@ for filename in filelists:
             flagsum = 0
             for NAICS_var_2 in range(10):
                 if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
-                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+                    if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'])!=0):
                         count1_string = str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2)
                         count = count + 1
                         flagsum = flagsum + cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range']
@@ -473,7 +501,9 @@ for filename in filelists:
                 NAICS_var_2 = 0
                 for NAICS_var_2 in range(10):
                     if str(State_var)+"-"+str(NAICS_var)+str(NAICS_var_2) in cbp_erange.index: 
-                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'])==0):
+                        if ((cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'])!=0):
+                            new= cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
+                            if new > cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'].item()
                             cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'emp'] = cbp_erange.loc[str(State_var)+'-'+str(NAICS_var)+str(NAICS_var_2),'e_range'] / flagsum * NAICS_rem
     
     
