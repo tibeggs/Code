@@ -19,7 +19,7 @@ n4list=[44]
 n5list=[48]
 
 filelist=os.listdir(path)
-filelists=[filelist[0]]
+filelists=[filelist[11],filelist[12]]
 
 for filename in filelists:
     df = pd.read_csv(path+"/"+filename)
@@ -730,4 +730,4 @@ for filename in filelists:
     print(total_time3)
     print(total_time4)
      #Export filled data
-    cbp_erange.to_csv(cleanpath+"/try2_"+filename)
+    cbp_erange.to_csv(cleanpath+"/try3_"+filename)
