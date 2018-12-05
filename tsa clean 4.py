@@ -22,39 +22,12 @@ n5list=[48]
 
 filelist=os.listdir(path)
 #filelist.remove(filelist[0])
-filelists=filelist
+filelists=[filelist[4]]
 
 
 for filename in filelists:
     df = pd.read_csv(path+"/"+filename)
-    df['clean_flag']=0
-    df.loc[(df['emp'].isna()), 'clean_flag']=1
-    df.loc[(df['emp']<0), 'clean_flag']=1
-    df.loc[(df['emp']==0)&(df['e_range']>10), 'clean_flag']=1
-    df1=df[['stctyid','clean_flag']].groupby('stctyid').sum().reset_index()
-    df1.loc[df1['clean_flag']>1,'clean_flag']=1
-    df1=df1[df1['clean_flag']==1]
-    df2= df.loc[df['stctyid'].isin(df1['stctyid'])]
-    df2.loc[(df2['naics']!='Total')&(df2['e_range'].notna()),'emp']=0
-    df2.loc[df2['emp'].isna(),'emp']=0
-    df2.loc[df2['ap'].isna(),'ap']=0
-    df2.loc[(df2['emp']==0)&df2['e_range'].isna(),'e_range']=0
-    df2.loc[df2['e_range']<0,'e_range']=0   
-    #df2.sort_values(['stctyid','naics_len'], ascending=False)
-    lister=df2.loc[(df2['emp']>0)&(df2['naics_len']>2),'cty_naics'].values
-    for i in reversed(lister) :
-        code=i[:-1]
-        cu=df2.loc[df2['cty_naics']==i,'emp'].item()
-        try:
-            up=df2.loc[df2['cty_naics']==code,'emp'].item()
-        except:
-            up=0
-        if up < cu:
-            org=df2.loc[df2['cty_naics']==code,'emp']
-            df2.loc[df2['cty_naics']==code,'emp']=org+(df2.loc[df2['cty_naics']==i, 'emp'].item())    
-    df3= df.loc[~df['stctyid'].isin(df1['stctyid'])]
-    df3.to_csv(cleanpath+"/sucess_"+filename)
-    cbp_erange=df2
+    cbp_erange=df
     cbp_erange.set_index('cty_naics',inplace=True)
     cutoff=cbp_erange['stctyid'].min()
     cutofft=cbp_erange['stctyid'].max()
@@ -63,7 +36,7 @@ for filename in filelists:
     naics_list5=set(cbp_erange['naics'][cbp_erange['naics'].str.len()==6].str[:4])
     naics_list6=set(cbp_erange['naics'][cbp_erange['naics'].str.len()==6].str[:5])
     
-    state_range=df1['stctyid']
+    state_range=df['stctyid'].unique()
     #list(range(cutoff,cutofft))
     
     t0=time.time()
@@ -78,49 +51,7 @@ for filename in filelists:
 #    cbp_erange.loc[cbp_erange['naics2'].isin(['45']),'naics2'] = '44'
 #    cbp_erange.loc[cbp_erange['naics2'].isin(['49']),'naics2'] = '48'
        
-    #need to add measure for above sum being 0
-    for naics_code in cbp_erange[cbp_erange['naics_len']==2].index:
-        if (cbp_erange.loc[naics_code,'naics2']!='99')&(cbp_erange.loc[naics_code,'naics2']!='To'):
-            dfl=cbp_erange[['stctyid','naics_len','emp','e_range']].groupby(['stctyid','naics_len']).sum().reset_index()
-            dfl.columns = ['stctyid','naics_len','emp_sum','erange_sum']
-            dfl1=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
-            dfl1.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
-            if cbp_erange.loc[naics_code,'emp']==0:
-                a = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==2), 'emp_sum'].item()
-                b = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==1), 'emp_sum'].item()
-                dif = b-a
-                c = cbp_erange.loc[naics_code,'e_range']
-                d = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics_len']==2), 'erange_sum'].item()
-                per = c/d
-                e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
-                f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-                try:
-                    g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
-                except:
-                    g = 0
-                if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<g):
-                    e=e+(g-((per*dif)-e))
-                try:
-                    h = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+3)), 'emp_sum'].item()
-                except:
-                    h = 0
-                if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<h):
-                    e=e+(h-((per*dif)-e))
-                try:
-                    i = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+4)), 'emp_sum'].item()
-                except:
-                    i = 0
-                if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<i):
-                    e=e+(g-((per*dif)-i))
-                if (per*dif <= e)&(dif!=0):
-                    if dif == e:
-                        cbp_erange.loc[(naics_code),'e_range'] = d
-                    else:
-                        x = (e*d/dif)/(1-e/dif)
-                        new_range = f/4 + x
-                        cbp_erange.loc[(naics_code),'e_range'] = new_range   
-                    
-                dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
+
     
     t21 = time.time()
     print(t21-t0)
@@ -158,42 +89,7 @@ for filename in filelists:
     t22 = time.time()
     print(t22-t21)
   
-    for naics_code in cbp_erange[cbp_erange['naics_len']==3].index:
-        dfl=cbp_erange[['stctyid','naics2','naics_len','emp','e_range']].groupby(['stctyid','naics2','naics_len']).sum().reset_index()
-        dfl.columns = ['stctyid','naics2','naics_len','emp_sum','erange_sum']
-        dfl1=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
-        dfl1.columns = ['stctyid','naics3','naics_len','emp_sum','erange_sum']
-        if cbp_erange.loc[naics_code,'emp']==0:
-          #  dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2']))]
-            a = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2'])) & (dfl['naics_len']==3), 'emp_sum'].item()
-            b = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2']))& (dfl['naics_len']==2), 'emp_sum'].item()
-            dif = b-a
-            c = cbp_erange.loc[naics_code,'e_range']
-            d = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl['naics_len']==3), 'erange_sum'].item()
-            per = c/d
-            e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
-            f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-            try:
-                g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
-            except:
-                g = 0
-            if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<g):
-                e=e+(g-((per*dif)-e))
-            try:
-                h = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics2']==(cbp_erange.loc[(naics_code),'naics2']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+3)), 'emp_sum'].item()
-            except:
-                h = 0
-            if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<h):
-                e=e+(h-((per*dif)-e))
-            if (per*dif <= e)&(dif!=0):
-                if dif == e:
-                    cbp_erange.loc[(naics_code),'e_range'] = d  
-                else:
-                    x = (e*d/dif)/(1-e/dif)
-                    new_range = f/4 + x
-                    if new_range > 0:
-                        cbp_erange.loc[(naics_code),'e_range'] = new_range  
-                        
+
     
     t31 = time.time()
     print(t31-t22)
@@ -365,34 +261,7 @@ for filename in filelists:
     print(t32-t31)
     
     
-    for naics_code in cbp_erange[cbp_erange['naics_len']==4].index:
-        dfl=cbp_erange[['stctyid','naics3','naics_len','emp','e_range']].groupby(['stctyid','naics3','naics_len']).sum().reset_index()
-        dfl.columns = ['stctyid','naics3','naics_len','emp_sum','erange_sum']
-        dfl1=cbp_erange[['stctyid','naics4','naics_len','emp','e_range']].groupby(['stctyid','naics4','naics_len']).sum().reset_index()
-        dfl1.columns = ['stctyid','naics4','naics_len','emp_sum','erange_sum']
-        if cbp_erange.loc[naics_code,'emp']==0:
-            a = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl['naics3']==(cbp_erange.loc[(naics_code),'naics3'])) & (dfl['naics_len']==4), 'emp_sum'].item()
-            b = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl['naics3']==(cbp_erange.loc[(naics_code),'naics3']))& (dfl['naics_len']==3), 'emp_sum'].item()
-            dif = b-a
-            c = cbp_erange.loc[naics_code,'e_range']
-            d = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics3']==(cbp_erange.loc[(naics_code),'naics3']))&(dfl['naics_len']==4), 'erange_sum'].item()
-            per = c/d
-            e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
-            f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-            try:
-                g = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+2)), 'emp_sum'].item()
-            except:
-                g=0
-            if (dif!=0)&((per*dif)-e>0)&((per*dif)-e<g):
-                e=e+(g-((per*dif)-e))
-            if (per*dif <= e)&(dif!=0):
-                if dif == e:
-                    cbp_erange.loc[(naics_code),'e_range'] = d  
-                else:
-                    x = (e*d/dif)/(1-e/dif)
-                    new_range = f/4 + x
-                    if new_range > 0:
-                        cbp_erange.loc[(naics_code),'e_range'] = new_range            
+        
     
     t41 = time.time()
     print(t41-t32)
@@ -431,28 +300,7 @@ for filename in filelists:
     t42 = time.time()
     print(t42-t41)
     
-    for naics_code in cbp_erange[cbp_erange['naics_len']==5].index:
-        dfl=cbp_erange[['stctyid','naics4','naics_len','emp','e_range']].groupby(['stctyid','naics4','naics_len']).sum().reset_index()
-        dfl.columns = ['stctyid','naics4','naics_len','emp_sum','erange_sum']
-        dfl1=cbp_erange[['stctyid','naics5','naics_len','emp','e_range']].groupby(['stctyid','naics5','naics_len']).sum().reset_index()
-        dfl1.columns = ['stctyid','naics5','naics_len','emp_sum','erange_sum']
-        if cbp_erange.loc[naics_code,'emp']==0:
-            a = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl['naics4']==(cbp_erange.loc[(naics_code),'naics4'])) & (dfl['naics_len']==5), 'emp_sum'].item()
-            b = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl['naics4']==(cbp_erange.loc[(naics_code),'naics4']))& (dfl['naics_len']==4), 'emp_sum'].item()
-            dif = b-a
-            c = cbp_erange.loc[naics_code,'e_range']
-            d = dfl.loc[(dfl['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))& (dfl['naics4']==(cbp_erange.loc[(naics_code),'naics4']))&(dfl['naics_len']==5), 'erange_sum'].item()
-            per = c/d
-            e = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'emp_sum'].item()
-            f = dfl1.loc[(dfl1['stctyid']==(cbp_erange.loc[(naics_code),'stctyid']))&(dfl1['naics5']==(cbp_erange.loc[(naics_code),'naics5']))&(dfl1['naics_len']==(cbp_erange.loc[(naics_code),'naics_len']+1)), 'erange_sum'].item()
-            if (per*dif <= e)&(dif!=0):
-                if dif == e:
-                    cbp_erange.loc[(naics_code),'e_range'] = d  
-                else:
-                    x = (e*d/dif)/(1-e/dif)
-                    new_range = f/4 + x
-                    if new_range > 0:
-                        cbp_erange.loc[(naics_code),'e_range'] = new_range               
+         
     
     t51 = time.time()
     print(t51-t42)
